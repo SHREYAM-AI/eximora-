@@ -1,0 +1,6 @@
+{
+  "name": "Eximora",
+  "description": "Eximora — Two-way cross-border trading house. Exporting Indian food products globally, importing electronic accessories for Indian commerce.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
