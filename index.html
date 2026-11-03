@@ -3,6 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Gracefully prevent unhandled Vite HMR WebSocket connection closure in sandbox iFrame proxy
+      window.addEventListener('unhandledrejection', function(event) {
+        if (
+          event.reason &&
+          (event.reason.message?.includes('WebSocket') ||
+           event.reason.stack?.includes('@vite/client') ||
+           event.reason.message?.includes('closed without opened'))
+        ) {
+          event.preventDefault();
+        }
+      });
+      window.addEventListener('error', function(event) {
+        if (
+          event.message?.includes('WebSocket') ||
+          event.filename?.includes('@vite/client')
+        ) {
+          event.preventDefault();
+        }
+      });
+    </script>
     <title>Eximora — Cross-Border Two-Way Trading House</title>
     <meta name="description" content="Eximora — Two-way cross-border trading house. Exporting Indian food products globally, importing electronic accessories for Indian commerce." />
     <meta property="og:title" content="Eximora — Cross-Border Two-Way Trading House" />

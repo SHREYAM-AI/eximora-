@@ -8,22 +8,26 @@ interface ChatMessage {
   timestamp: string;
 }
 
+interface ExoraChatbotProps {
+  onOpenOrderModal?: () => void;
+}
+
 const INITIAL_MESSAGE: ChatMessage = {
   id: 'init-1',
   role: 'assistant',
   content:
-    'Greetings. I am Exora, your AI trade concierge at Eximora. I can address inquiries regarding our Indian food export corridor, electronic accessories imports, our asset-light sourcing model, or guide your priority registration. How may I assist you today?',
+    'Greetings. I am Exora, your AI trade concierge at Eximora. You can inquire about our bilateral corridors or place an order directly with AI—I will register your trade query, route it into execution (sourcing & certification), and track it through to fulfillment. How may I assist you today?',
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
 };
 
 const SUGGESTIONS = [
+  'Place an order with AI',
   'How does food export from India work?',
   'What electronic accessories do you import?',
   'Explain the asset-light model',
-  'How do I onboard as an overseas buyer?',
 ];
 
-export function ExoraChatbot() {
+export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
@@ -53,6 +57,12 @@ export function ExoraChatbot() {
   const handleSend = async (messageText?: string) => {
     const textToSend = (messageText || input).trim();
     if (!textToSend || isLoading) return;
+
+    if (textToSend === 'Place an order with AI' && onOpenOrderModal) {
+      onOpenOrderModal();
+      setIsOpen(false);
+      return;
+    }
 
     const userMsg: ChatMessage = {
       id: 'usr-' + Date.now(),
@@ -99,9 +109,12 @@ export function ExoraChatbot() {
       // Graceful smart fallback
       let fallbackText =
         'Eximora operates as an asset-light, two-way trading house. We source certified Indian agro and food products for overseas buyers, and procure electronic accessories for Indian retailers. We source, certify, ship, and sell.';
-      
+
       const lower = textToSend.toLowerCase();
-      if (lower.includes('food') || lower.includes('farmer') || lower.includes('export') || lower.includes('agro')) {
+      if (lower.includes('order') || lower.includes('place order') || lower.includes('buy') || lower.includes('procure')) {
+        fallbackText =
+          'You can place an order directly with AI using our AI Order Placement Desk! Exora will register your commercial trade query, validate tariff and compliance specs, move it into execution (certified farmer/processor or electronics OEM sourcing), and track it through to final delivery fulfillment.';
+      } else if (lower.includes('food') || lower.includes('farmer') || lower.includes('export') || lower.includes('agro')) {
         fallbackText =
           'Our Food Export corridor connects certified Indian farmers and food processors directly to overseas commercial buyers. We manage quality certification, compliance testing, export packaging, and shipping without operating manufacturing facilities.';
       } else if (lower.includes('electronic') || lower.includes('accessory') || lower.includes('import') || lower.includes('retail')) {
@@ -112,7 +125,7 @@ export function ExoraChatbot() {
           'Being asset-light means Eximora does not own factories or heavy manufacturing machinery. Instead, we orchestrate the four core pillars: Sourcing high-grade products, Certifying quality and compliance, Shipping through global cold/dry logistics, and Selling to commercial counterparties.';
       } else if (lower.includes('register') || lower.includes('buyer') || lower.includes('contact') || lower.includes('waitlist')) {
         fallbackText =
-          'You can register your interest directly using the form on this page, or select "Trade Desk" in the top navigation to submit a direct bilateral procurement inquiry.';
+          'You can register your interest directly using the form on this page, or click "Place Order with AI" to register an active procurement query into our execution pipeline.';
       }
 
       const assistantMsg: ChatMessage = {
