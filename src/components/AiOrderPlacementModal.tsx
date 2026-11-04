@@ -110,9 +110,9 @@ export function AiOrderPlacementModal({
         origin: mode === 'structured' ? origin : undefined,
         destination: mode === 'structured' ? destination : undefined,
         incoterm: mode === 'structured' ? incoterm : undefined,
-        clientName: clientName.trim() || 'Authorized Buyer Representative',
-        clientCompany: clientCompany.trim() || 'Global Commercial Trade Partner',
-        clientEmail: clientEmail.trim() || 'buyer@tradehouse.com',
+        clientName: clientName.trim() || 'Client Trade Account',
+        clientCompany: clientCompany.trim() || '',
+        clientEmail: clientEmail.trim() || '',
         specialInstructions: mode === 'natural' ? promptInput : 'Commercial packaging and compliance verified.',
       };
 
@@ -149,28 +149,28 @@ export function AiOrderPlacementModal({
           mode === 'structured' && productName
             ? productName
             : corridor === 'export_agro'
-            ? 'Organic Basmati Rice & Agro Harvest'
-            : '65W GaN Fast Wall Chargers',
+            ? 'Agricultural Commodities'
+            : 'Electronic Accessories',
         productCategory:
           corridor === 'export_agro' ? 'Food & Agricultural Commodities' : 'Consumer Electronic Accessories',
-        quantity: mode === 'structured' && quantity ? quantity : corridor === 'export_agro' ? '25' : '3,000',
+        quantity: mode === 'structured' && quantity ? quantity : corridor === 'export_agro' ? '1' : '1,000',
         unit: mode === 'structured' && unit ? unit : corridor === 'export_agro' ? 'Metric Tons' : 'Units',
         origin:
           mode === 'structured' && origin
             ? origin
             : corridor === 'export_agro'
-            ? 'Punjab / Haryana Agribusiness Belt, India'
-            : 'Shenzhen Tech Corridor Hub',
+            ? 'India'
+            : 'Global Tech Hub',
         destination:
           mode === 'structured' && destination
             ? destination
             : corridor === 'export_agro'
-            ? 'Jebel Ali Port / Rotterdam'
-            : 'Delhi ICD / Nhava Sheva, India',
+            ? 'International Destination Port'
+            : 'India Port/ICD',
         incoterm: mode === 'structured' ? incoterm : corridor === 'export_agro' ? 'CIF' : 'DDP',
-        clientName: clientName || 'Authorized Trade Representative',
-        clientCompany: clientCompany || 'International Merchant Group',
-        clientEmail: clientEmail || 'desk@tradehouse.com',
+        clientName: clientName || 'Client Trade Account',
+        clientCompany: clientCompany || '',
+        clientEmail: clientEmail || '',
         certificationsRequired:
           corridor === 'export_agro'
             ? ['APEDA Phytosanitary', 'FSSAI Laboratory Certificate', 'ISO 22000']

@@ -27,174 +27,19 @@ export default function App() {
     type: 'private',
   });
 
-  const [orders, setOrders] = useState<TradeOrder[]>([
-    {
-      id: 'ord-exm-001',
-      orderNumber: 'EXM-AGRO-2026-8812',
-      corridor: 'export_agro',
-      productName: '1121 Extra Long Steam Basmati Rice',
-      productCategory: 'Food & Agricultural Commodities',
-      quantity: '24',
-      unit: 'Metric Tons (1x40ft FCL)',
-      origin: 'Punjab / Haryana Processing Cluster, India',
-      destination: 'Port of Jebel Ali, Dubai, UAE',
-      incoterm: 'CIF',
-      clientName: 'Hamdan Al-Maktoum Trading LLC',
-      clientCompany: 'Gulf Horizon Foodstuffs',
-      clientEmail: 'procurement@gulfhorizonfoods.ae',
-      targetPriceEstimate: '$1,140 / MT',
-      certificationsRequired: ['APEDA Phytosanitary', 'FSSAI Export Clearance', 'SGS Pre-Shipment Purity Report'],
-      hsnCode: '1006.30.20',
-      specialInstructions: 'Moisture content strictly under 12.5%. 25kg vacuum-sealed master gunny bags.',
-      stage: 'execution',
-      progressPercent: 65,
-      registeredAt: '2026-10-28 09:30 UTC',
-      lastUpdated: '2026-11-02 14:15 UTC',
-      aiQueryAnalysis: {
-        summary: 'High-grade Basmati export requirement for GCC retail distribution. Grade verified against APEDA standards.',
-        riskAssessment: 'Low Risk',
-        assetLightAction: 'Aggregated directly from APEDA-certified millers in Karnal; SGS inspection lab booked for container stuffing.',
-        matchedNetwork: 'Verified Haryana Farmer Cooperative & Northern Milling Cluster #04',
-      },
-      milestones: [
-        {
-          id: 'm1',
-          title: 'AI Order Query Registered & Parsed',
-          timestamp: '2026-10-28 09:30 UTC',
-          completed: true,
-          notes: 'Specifications, incoterm CIF Jebel Ali, and compliance parameters validated.',
-          category: 'query',
-        },
-        {
-          id: 'm2',
-          title: 'Producer Allocation & Pre-Cert Sourcing',
-          timestamp: '2026-10-29 11:20 UTC',
-          completed: true,
-          notes: 'Batch #BR-901 allocated from certified Karnal mill cluster. Moisture test passed at 11.8%.',
-          category: 'sourcing',
-        },
-        {
-          id: 'm3',
-          title: 'Mandatory Phytosanitary & APEDA Audit',
-          timestamp: '2026-10-31 16:40 UTC',
-          completed: true,
-          notes: 'Phytosanitary inspection certificate PSC-IND-88219 issued. Zero pesticide residue detected.',
-          category: 'certification',
-        },
-        {
-          id: 'm4',
-          title: 'Port Nhava Sheva Freight Booking & Seal',
-          timestamp: '2026-11-02 14:15 UTC',
-          completed: true,
-          notes: 'Container MSKU-908123-4 stuffed & customs sealed. Scheduled on CMA CGM Mumbai Express.',
-          category: 'shipping',
-        },
-        {
-          id: 'm5',
-          title: 'Final Customs Clearance & Delivery Handover',
-          timestamp: 'Pending vessel arrival at Jebel Ali',
-          completed: false,
-          notes: 'Bill of Lading BL-EXM-0941 issued. Awaiting destination customs broker sign-off.',
-          category: 'delivery',
-        },
-      ],
-      fulfillmentDoc: {
-        trackingNumber: 'BL-EXM-0941-DXB',
-        vesselOrFlight: 'CMA CGM Mumbai Express / Voy 104W',
-        inspectionPassId: 'APEDA-SGS-99120',
-        fulfillmentStatus: 'In Transit to Destination Port',
-      },
-    },
-    {
-      id: 'ord-exm-002',
-      orderNumber: 'EXM-ELEC-2026-4190',
-      corridor: 'import_electronics',
-      productName: '65W GaN Dual USB-C Fast Wall Chargers (BIS Certified)',
-      productCategory: 'Consumer Electronic Accessories',
-      quantity: '5,000',
-      unit: 'Units (Retail Packaged)',
-      origin: 'Electronics Assembly Corridor, Shenzhen/Taipei',
-      destination: 'New Delhi ICD Tughlakabad / Bengaluru Hub, India',
-      incoterm: 'DDP',
-      clientName: 'Vikram Sethi',
-      clientCompany: 'Apex Mobile Retail Networks Pvt Ltd',
-      clientEmail: 'v.sethi@apexretail.in',
-      targetPriceEstimate: '$6.80 / Unit',
-      certificationsRequired: ['BIS CRS Registration (IS 13252)', 'RoHS 2.0 Compliance', 'CE / IEC 62368-1'],
-      hsnCode: '8504.40.90',
-      specialInstructions: 'Indian round pin plug configuration (Type D/M compatible). Custom retail blister packaging.',
-      stage: 'fulfilled',
-      progressPercent: 100,
-      registeredAt: '2026-10-15 08:00 UTC',
-      lastUpdated: '2026-10-27 17:30 UTC',
-      aiQueryAnalysis: {
-        summary: 'Commercial wholesale replenishment for Indian tier-1 electronics retailers. BIS safety protocol critical.',
-        riskAssessment: 'Standard',
-        assetLightAction: 'Matched with audited GaN specialist OEM. Verified pre-existing BIS CRS certificate R-41098273.',
-        matchedNetwork: 'Shenzhen Tier-1 Power Electronics OEM Partner #12',
-      },
-      milestones: [
-        {
-          id: 'm1',
-          title: 'AI Order Query Registered & Parsed',
-          timestamp: '2026-10-15 08:00 UTC',
-          completed: true,
-          notes: 'Power specs (65W GaN, PD 3.0, PPS) and Indian BIS compliance requirements verified.',
-          category: 'query',
-        },
-        {
-          id: 'm2',
-          title: 'Factory Sourcing & Batch QA',
-          timestamp: '2026-10-17 12:00 UTC',
-          completed: true,
-          notes: '5,000 units inspected. Thermal stress test and drop test passed at 99.8% yield.',
-          category: 'sourcing',
-        },
-        {
-          id: 'm3',
-          title: 'BIS CRS Verification & Indian Customs Filing',
-          timestamp: '2026-10-20 09:30 UTC',
-          completed: true,
-          notes: 'BIS Certification R-41098273 filed with Indian ICEGATE portal. Duty & IGST cleared.',
-          category: 'certification',
-        },
-        {
-          id: 'm4',
-          title: 'Air Cargo Express Transit',
-          timestamp: '2026-10-23 15:45 UTC',
-          completed: true,
-          notes: 'Air Waybill AWB-098-44109312. Landed at Delhi IGI Airport cargo terminal.',
-          category: 'shipping',
-        },
-        {
-          id: 'm5',
-          title: 'Warehouse Handover & Final Fulfillment',
-          timestamp: '2026-10-27 17:30 UTC',
-          completed: true,
-          notes: 'Dispatched to Apex Central Distribution Warehouse, Okhla Phase III. Proof of Delivery signed.',
-          category: 'delivery',
-        },
-      ],
-      fulfillmentDoc: {
-        trackingNumber: 'AWB-098-44109312',
-        vesselOrFlight: 'Air India Cargo Flight AI-319',
-        inspectionPassId: 'BIS-CRS-R41098273',
-        fulfillmentStatus: 'Fulfilled & Handed Over',
-      },
-    },
-  ]);
+  const [orders, setOrders] = useState<TradeOrder[]>([]);
 
   // Load orders from server on mount
   useEffect(() => {
     fetch('/api/orders')
       .then((res) => res.json())
       .then((data) => {
-        if (data && Array.isArray(data.orders) && data.orders.length > 0) {
+        if (data && Array.isArray(data.orders)) {
           setOrders(data.orders);
         }
       })
       .catch((err) => {
-        console.warn('Could not fetch server orders, utilizing benchmark initial state:', err);
+        console.warn('Could not fetch server orders:', err);
       });
   }, []);
 

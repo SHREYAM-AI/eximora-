@@ -202,74 +202,95 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
           </span>
         </div>
 
-        {/* Master-Detail Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
-          {/* Left Column: Order List Selector */}
-          <div className="lg:col-span-5 space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
-            {filteredOrders.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 border border-dashed border-white/10 rounded-xl">
-                <p className="text-xs">No orders in this corridor yet.</p>
-                <button
-                  type="button"
-                  onClick={onOpenOrderModal}
-                  className="mt-2 text-xs text-amber-300 hover:underline"
-                >
-                  Place the first order
-                </button>
-              </div>
-            ) : (
-              filteredOrders.map((ord) => {
-                const isSelected = activeOrder?.id === ord.id;
-                return (
-                  <div
-                    key={ord.id}
-                    onClick={() => setSelectedOrder(ord)}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer text-left relative ${
-                      isSelected
-                        ? 'bg-white/[0.06] border-amber-400/50 shadow-md'
-                        : 'bg-white/[0.02] border-white/10 hover:border-white/20'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <span className="font-mono text-xs font-semibold text-white tracking-wider">
-                        {ord.orderNumber}
-                      </span>
-                      {getStageBadge(ord.stage)}
-                    </div>
-
-                    <h4 className="text-sm font-medium text-slate-100 line-clamp-1">{ord.productName}</h4>
-
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2 font-mono">
-                      <span>
-                        {ord.quantity} {ord.unit}
-                      </span>
-                      <span className="text-slate-400 truncate max-w-[140px] text-right">
-                        {ord.incoterm} · {ord.destination}
-                      </span>
-                    </div>
-
-                    {/* Progress bar line */}
-                    <div className="w-full bg-white/10 h-1 rounded-full mt-2.5 overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-500 ${
-                          ord.stage === 'fulfilled'
-                            ? 'bg-emerald-400'
-                            : ord.stage === 'execution'
-                            ? 'bg-amber-400'
-                            : 'bg-blue-400'
-                        }`}
-                        style={{ width: `${ord.progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })
-            )}
+        {/* Empty State or Master-Detail Split Grid */}
+        {orders.length === 0 ? (
+          <div className="py-14 px-6 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.01] mt-6">
+            <div className="w-12 h-12 mx-auto rounded-full bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-300 mb-4">
+              <FileText className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-serif text-white font-medium">No Orders Placed Yet</h3>
+            <p className="text-xs text-slate-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+              Your trade pipeline is clean. Submit a commercial order query via the AI Order Placement terminal to register specifications and initiate execution.
+            </p>
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={onOpenOrderModal}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-amber-200 to-amber-300 hover:from-amber-100 hover:to-amber-200 rounded-xl transition-all shadow-md cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Place Order with AI</span>
+              </button>
+            </div>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+            {/* Left Column: Order List Selector */}
+            <div className="lg:col-span-5 space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+              {filteredOrders.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 border border-dashed border-white/10 rounded-xl">
+                  <p className="text-xs">No orders in this corridor yet.</p>
+                  <button
+                    type="button"
+                    onClick={() => setFilterCorridor('all')}
+                    className="mt-2 text-xs text-amber-300 hover:underline"
+                  >
+                    View All Orders ({orders.length})
+                  </button>
+                </div>
+              ) : (
+                filteredOrders.map((ord) => {
+                  const isSelected = activeOrder?.id === ord.id;
+                  return (
+                    <div
+                      key={ord.id}
+                      onClick={() => setSelectedOrder(ord)}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer text-left relative ${
+                        isSelected
+                          ? 'bg-white/[0.06] border-amber-400/50 shadow-md'
+                          : 'bg-white/[0.02] border-white/10 hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="font-mono text-xs font-semibold text-white tracking-wider">
+                          {ord.orderNumber}
+                        </span>
+                        {getStageBadge(ord.stage)}
+                      </div>
 
-          {/* Right Column: Selected Order Detailed Lifecycle View */}
-          {activeOrder && (
-            <div className="lg:col-span-7 bg-white/[0.02] border border-white/10 rounded-xl p-5 space-y-5">
+                      <h4 className="text-sm font-medium text-slate-100 line-clamp-1">{ord.productName}</h4>
+
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2 font-mono">
+                        <span>
+                          {ord.quantity} {ord.unit}
+                        </span>
+                        <span className="text-slate-400 truncate max-w-[140px] text-right">
+                          {ord.incoterm} · {ord.destination}
+                        </span>
+                      </div>
+
+                      {/* Progress bar line */}
+                      <div className="w-full bg-white/10 h-1 rounded-full mt-2.5 overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-500 ${
+                            ord.stage === 'fulfilled'
+                              ? 'bg-emerald-400'
+                              : ord.stage === 'execution'
+                              ? 'bg-amber-400'
+                              : 'bg-blue-400'
+                          }`}
+                          style={{ width: `${ord.progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Right Column: Selected Order Detailed Lifecycle View */}
+            {activeOrder ? (
+              <div className="lg:col-span-7 bg-white/[0.02] border border-white/10 rounded-xl p-5 space-y-5">
               {/* Top Banner */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
                 <div>
@@ -427,9 +448,18 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
                 )}
               </div>
             </div>
+          ) : (
+            <div className="lg:col-span-7 bg-white/[0.02] border border-white/10 rounded-xl p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
+              <FileText className="w-8 h-8 text-slate-500 mb-2" />
+              <p className="text-sm text-slate-300 font-medium">Select an order from the list</p>
+              <p className="text-xs text-slate-500 mt-1">
+                View live registration dockets, sourcing status, certifications, and fulfillment timeline.
+              </p>
+            </div>
           )}
         </div>
-      </div>
+      )}
     </div>
+  </div>
   );
 }
