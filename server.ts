@@ -167,10 +167,10 @@ Return a valid JSON object matching this schema:
       const resolvedCategory =
         extractedData.productCategory || (resolvedCorridor === 'export_agro' ? 'Food & Agricultural Commodities' : 'Consumer Electronic Accessories');
 
-      const resolvedQuantity = extractedData.quantity || quantity || (resolvedCorridor === 'export_agro' ? '20' : '2,500');
+      const resolvedQuantity = extractedData.quantity || quantity || '1';
       const resolvedUnit = extractedData.unit || unit || (resolvedCorridor === 'export_agro' ? 'Metric Tons' : 'Units');
-      const resolvedOrigin = extractedData.origin || origin || (resolvedCorridor === 'export_agro' ? 'India (Punjab/Gujarat Trade Corridor)' : 'Global Electronics Hub (Shenzhen/Taipei)');
-      const resolvedDestination = extractedData.destination || destination || (resolvedCorridor === 'export_agro' ? 'Port of Rotterdam / Jebel Ali' : 'Delhi ICD / Nhava Sheva, India');
+      const resolvedOrigin = extractedData.origin || origin || (resolvedCorridor === 'export_agro' ? 'India' : 'Global Tech Hub');
+      const resolvedDestination = extractedData.destination || destination || (resolvedCorridor === 'export_agro' ? 'Destination Port' : 'India Destination Port/ICD');
       const resolvedIncoterm = (extractedData.incoterm || incoterm || (resolvedCorridor === 'export_agro' ? 'CIF' : 'DDP')) as 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
 
       const certs = extractedData.certificationsRequired || (resolvedCorridor === 'export_agro' ? ['APEDA Export Certification', 'Phytosanitary Inspection', 'FSSAI Lab Tested'] : ['BIS CRS Registration', 'CE Certified', 'RoHS Compliance']);
@@ -189,8 +189,8 @@ Return a valid JSON object matching this schema:
           ? 'Dispatching sourcing request to verified Indian farming cooperatives & APEDA accredited milling hubs.'
           : 'Connecting to audited electronic component manufacturers with active BIS/CE test certificates.',
         matchedNetwork: resolvedCorridor === 'export_agro'
-          ? 'Verified Indian Agricultural Producer Network #07'
-          : 'High-Reliability Electronics Partner Hub #14',
+          ? 'Verified Indian Agricultural Producer Network'
+          : 'Accredited Electronics Manufacturing Hub',
       };
 
       const newOrder: TradeOrder = {
@@ -207,7 +207,7 @@ Return a valid JSON object matching this schema:
         clientName: clientName || 'Authorized Trade Representative',
         clientCompany: clientCompany || 'Registered Commercial Enterprise',
         clientEmail: clientEmail || 'client@enterprise.com',
-        targetPriceEstimate: extractedData.targetPriceEstimate || (resolvedCorridor === 'export_agro' ? 'Market Spot Rate' : '$5.50 - $8.00 / Unit'),
+        targetPriceEstimate: extractedData.targetPriceEstimate || 'Spot Trade Pricing upon Sourcing Allocation',
         certificationsRequired: certs,
         hsnCode: hsn,
         specialInstructions: specialInstructions || naturalLanguagePrompt || 'Standard commercial export/import compliance packaging.',

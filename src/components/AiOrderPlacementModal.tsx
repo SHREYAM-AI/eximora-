@@ -153,7 +153,7 @@ export function AiOrderPlacementModal({
             : 'Electronic Accessories',
         productCategory:
           corridor === 'export_agro' ? 'Food & Agricultural Commodities' : 'Consumer Electronic Accessories',
-        quantity: mode === 'structured' && quantity ? quantity : corridor === 'export_agro' ? '1' : '1,000',
+        quantity: mode === 'structured' && quantity ? quantity : (quantity || '1'),
         unit: mode === 'structured' && unit ? unit : corridor === 'export_agro' ? 'Metric Tons' : 'Units',
         origin:
           mode === 'structured' && origin

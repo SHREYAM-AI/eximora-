@@ -363,9 +363,9 @@ export default function App() {
           </span>
         </div>
 
-        {/* MARKET PERFORMANCE & ESTIMATED TRADE VOLUME TRENDS DASHBOARD */}
+        {/* MARKET PERFORMANCE & REAL TRADE VOLUME TRENDS DASHBOARD */}
         <div className="mt-16 sm:mt-20 w-full">
-          <MarketPerformanceDashboard onOpenOrderModal={handleOpenOrderModal} />
+          <MarketPerformanceDashboard orders={orders} onOpenOrderModal={handleOpenOrderModal} />
         </div>
 
         {/* INTERACTIVE AI ORDER PLACEMENT & EXECUTION TRACKER */}
