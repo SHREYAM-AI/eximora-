@@ -12,6 +12,7 @@ import { WaitlistForm } from './components/WaitlistForm';
 import { ExoraChatbot } from './components/ExoraChatbot';
 import { AiOrderPlacementModal } from './components/AiOrderPlacementModal';
 import { OrderPipelineViewer } from './components/OrderPipelineViewer';
+import { MarketPerformanceDashboard } from './components/MarketPerformanceDashboard';
 import { TradeOrder, TradeCorridor } from './types/order';
 import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles } from 'lucide-react';
 
@@ -174,6 +175,12 @@ export default function App() {
           >
             <Sparkles className="w-3 h-3 text-amber-300" />
             <span>AI Order Desk</span>
+          </a>
+          <a
+            href="#market-performance"
+            className="hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0"
+          >
+            Market Trends
           </a>
           <a
             href="#corridors"
@@ -354,6 +361,11 @@ export default function App() {
             <CheckCircle className="w-3.5 h-3.5 text-amber-300" />
             <span>Sell</span>
           </span>
+        </div>
+
+        {/* MARKET PERFORMANCE & ESTIMATED TRADE VOLUME TRENDS DASHBOARD */}
+        <div className="mt-16 sm:mt-20 w-full">
+          <MarketPerformanceDashboard onOpenOrderModal={handleOpenOrderModal} />
         </div>
 
         {/* INTERACTIVE AI ORDER PLACEMENT & EXECUTION TRACKER */}
