@@ -57,8 +57,28 @@ interface TradeOrder {
   };
 }
 
-// In-memory store for client trade orders
+interface VisitorSession {
+  id: string;
+  timestamp: string;
+  device: string;
+  path: string;
+  referrer: string;
+  corridorInterest: 'export_agro' | 'import_electronics' | 'general';
+  lastActive: string;
+}
+
+interface WaitlistRegistration {
+  id: string;
+  email: string;
+  category: string;
+  code: string;
+  joinedAt: string;
+}
+
+// In-memory stores
 const inMemoryOrders: TradeOrder[] = [];
+const inMemoryVisitors: VisitorSession[] = [];
+const inMemoryWaitlist: WaitlistRegistration[] = [];
 
 async function startServer() {
   const app = express();
@@ -81,6 +101,103 @@ async function startServer() {
   // GET /api/orders - list current trade orders
   app.get('/api/orders', (_req, res) => {
     res.json({ orders: inMemoryOrders });
+  });
+
+  // POST /api/visits - record/update visitor session telemetry
+  app.post('/api/visits', (req, res) => {
+    try {
+      const { sessionId, device, path: visitPath, referrer, corridorInterest } = req.body;
+      const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+
+      const existingIndex = inMemoryVisitors.findIndex((v) => v.id === sessionId);
+      if (existingIndex >= 0) {
+        inMemoryVisitors[existingIndex].lastActive = now;
+        if (visitPath) inMemoryVisitors[existingIndex].path = visitPath;
+        if (corridorInterest) inMemoryVisitors[existingIndex].corridorInterest = corridorInterest;
+      } else {
+        const userAgent = req.headers['user-agent'] || '';
+        let detectedDevice = device || 'Desktop';
+        if (!device) {
+          if (/mobile/i.test(userAgent)) detectedDevice = 'Mobile';
+          else if (/tablet|ipad/i.test(userAgent)) detectedDevice = 'Tablet';
+        }
+
+        inMemoryVisitors.unshift({
+          id: sessionId || 'sess-' + Math.random().toString(36).substring(2, 9),
+          timestamp: now,
+          device: detectedDevice,
+          path: visitPath || '/',
+          referrer: referrer || 'Direct Trade Traffic',
+          corridorInterest: corridorInterest || 'general',
+          lastActive: now,
+        });
+
+        // Cap stored visitors to last 500
+        if (inMemoryVisitors.length > 500) {
+          inMemoryVisitors.pop();
+        }
+      }
+
+      // Calculate active visitors in last 15 mins
+      const fifteenMinsAgo = Date.now() - 15 * 60 * 1000;
+      const activeCount = inMemoryVisitors.filter((v) => {
+        const t = new Date(v.lastActive).getTime();
+        return !isNaN(t) && t > fifteenMinsAgo;
+      }).length;
+
+      res.json({ success: true, activeVisitorsNow: Math.max(1, activeCount) });
+    } catch (e: any) {
+      res.status(500).json({ error: 'Failed to record visit' });
+    }
+  });
+
+  // GET /api/admin/metrics - comprehensive operations telemetry for Admin Centre
+  app.get('/api/admin/metrics', (_req, res) => {
+    const fifteenMinsAgo = Date.now() - 15 * 60 * 1000;
+    const activeVisitorsNow = Math.max(
+      1,
+      inMemoryVisitors.filter((v) => {
+        const t = new Date(v.lastActive).getTime();
+        return !isNaN(t) && t > fifteenMinsAgo;
+      }).length
+    );
+
+    res.json({
+      orders: inMemoryOrders,
+      totalVisits: inMemoryVisitors.length,
+      activeVisitorsNow,
+      recentVisitors: inMemoryVisitors.slice(0, 50),
+      waitlist: inMemoryWaitlist,
+    });
+  });
+
+  // POST /api/waitlist - record waitlist registration
+  app.post('/api/waitlist', (req, res) => {
+    try {
+      const { email, category, code } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+
+      const now = new Date().toISOString().replace('T', ' ').slice(0, 10);
+      const entry: WaitlistRegistration = {
+        id: 'reg-' + Date.now(),
+        email: email.trim().toLowerCase(),
+        category: category || 'Bilateral Trade Partner',
+        code: code || `EXM-TRD-${Math.floor(1000 + Math.random() * 9000)}`,
+        joinedAt: now,
+      };
+
+      inMemoryWaitlist.unshift(entry);
+      res.status(201).json({ success: true, entry });
+    } catch (err: any) {
+      res.status(500).json({ error: 'Failed to register' });
+    }
+  });
+
+  // GET /api/waitlist - list waitlist entries
+  app.get('/api/waitlist', (_req, res) => {
+    res.json({ waitlist: inMemoryWaitlist });
   });
 
   // POST /api/orders/parse-and-register - AI based order placement

@@ -13,12 +13,14 @@ import { ExoraChatbot } from './components/ExoraChatbot';
 import { AiOrderPlacementModal } from './components/AiOrderPlacementModal';
 import { OrderPipelineViewer } from './components/OrderPipelineViewer';
 import { MarketPerformanceDashboard } from './components/MarketPerformanceDashboard';
+import { AdminCentreModal } from './components/AdminCentreModal';
 import { TradeOrder, TradeCorridor } from './types/order';
-import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield } from 'lucide-react';
 
 export default function App() {
   const [isManifestoOpen, setIsManifestoOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [orderModalCorridor, setOrderModalCorridor] = useState<TradeCorridor>('export_agro');
   const [inquiryModalState, setInquiryModalState] = useState<{
     isOpen: boolean;
@@ -29,6 +31,29 @@ export default function App() {
   });
 
   const [orders, setOrders] = useState<TradeOrder[]>([]);
+
+  // Record visitor session telemetry
+  useEffect(() => {
+    try {
+      let sessionId = sessionStorage.getItem('eximora_session_id');
+      if (!sessionId) {
+        sessionId = 'sess-' + Math.random().toString(36).substring(2, 9);
+        sessionStorage.setItem('eximora_session_id', sessionId);
+      }
+      fetch('/api/visits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          path: window.location.pathname,
+          referrer: document.referrer || 'Direct Trade Traffic',
+          corridorInterest: 'general',
+        }),
+      }).catch(() => {});
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Load orders from server on mount
   useEffect(() => {
@@ -197,10 +222,12 @@ export default function App() {
           </button>
           <button
             type="button"
-            onClick={() => setInquiryModalState({ isOpen: true, type: 'private' })}
-            className="hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 cursor-pointer"
+            onClick={() => setIsAdminOpen(true)}
+            className="hover:text-amber-200 transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 text-amber-300/90"
+            title="Open Eximora Operations & Intelligence Centre"
           >
-            Trade Desk
+            <Shield className="w-3 h-3" />
+            <span>Admin Centre</span>
           </button>
         </nav>
 
@@ -464,6 +491,14 @@ export default function App() {
             >
               Trade Inquiries
             </button>
+            <button
+              type="button"
+              onClick={() => setIsAdminOpen(true)}
+              className="hover:text-amber-300 text-amber-200/90 transition-colors cursor-pointer flex items-center gap-1 font-medium"
+            >
+              <Shield className="w-3 h-3 text-amber-300" />
+              <span>Admin Centre</span>
+            </button>
           </div>
         </div>
       </footer>
@@ -483,6 +518,13 @@ export default function App() {
         initialCorridor={orderModalCorridor}
         onClose={() => setIsOrderModalOpen(false)}
         onOrderPlaced={handleOrderPlaced}
+      />
+      <AdminCentreModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        orders={orders}
+        onAdvanceOrder={handleAdvanceOrder}
+        onOpenOrderModal={handleOpenOrderModal}
       />
 
       {/* Floating AI Trade Concierge: Exora */}

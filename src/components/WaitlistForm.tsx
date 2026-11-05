@@ -59,6 +59,11 @@ export function WaitlistForm() {
 
       try {
         localStorage.setItem('eximora_waitlist_entry', JSON.stringify(entry));
+        fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: trimmed, category, code }),
+        }).catch(() => {});
       } catch {
         // ignore
       }
