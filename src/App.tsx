@@ -13,15 +13,17 @@ import { ExoraChatbot } from './components/ExoraChatbot';
 import { AiOrderPlacementModal } from './components/AiOrderPlacementModal';
 import { OrderPipelineViewer } from './components/OrderPipelineViewer';
 import { MarketPerformanceDashboard } from './components/MarketPerformanceDashboard';
+import { TradeCommunityHub } from './components/TradeCommunityHub';
 import { AdminCentreModal } from './components/AdminCentreModal';
 import { TradeOrder, TradeCorridor } from './types/order';
-import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield, Users } from 'lucide-react';
 
 export default function App() {
   const [isManifestoOpen, setIsManifestoOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [orderModalCorridor, setOrderModalCorridor] = useState<TradeCorridor>('export_agro');
+  const [orderModalPresetPrompt, setOrderModalPresetPrompt] = useState<string>('');
   const [inquiryModalState, setInquiryModalState] = useState<{
     isOpen: boolean;
     type: 'private' | 'press';
@@ -69,8 +71,9 @@ export default function App() {
       });
   }, []);
 
-  const handleOpenOrderModal = (corridor: TradeCorridor = 'export_agro') => {
+  const handleOpenOrderModal = (corridor: TradeCorridor = 'export_agro', presetPrompt: string = '') => {
     setOrderModalCorridor(corridor);
+    setOrderModalPresetPrompt(presetPrompt);
     setIsOrderModalOpen(true);
   };
 
@@ -195,6 +198,13 @@ export default function App() {
         {/* Zone 2: Concise single-line text navigation links */}
         <nav className="hidden md:flex items-center gap-8 text-xs font-medium tracking-wider uppercase text-slate-400">
           <a
+            href="#trade-community"
+            className="hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5"
+          >
+            <Users className="w-3 h-3 text-amber-300" />
+            <span>Community & Insights</span>
+          </a>
+          <a
             href="#ai-order-system"
             className="hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5"
           >
@@ -213,13 +223,6 @@ export default function App() {
           >
             Two-Way Trade
           </a>
-          <button
-            type="button"
-            onClick={() => setIsManifestoOpen(true)}
-            className="hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            Manifesto
-          </button>
           <button
             type="button"
             onClick={() => setIsAdminOpen(true)}
@@ -395,6 +398,11 @@ export default function App() {
           <MarketPerformanceDashboard orders={orders} onOpenOrderModal={handleOpenOrderModal} />
         </div>
 
+        {/* BILATERAL IMPORT-EXPORT COMMUNITY & INDUSTRY INSIGHTS HUB */}
+        <div className="mt-16 sm:mt-20 w-full">
+          <TradeCommunityHub onOpenOrderModal={handleOpenOrderModal} />
+        </div>
+
         {/* INTERACTIVE AI ORDER PLACEMENT & EXECUTION TRACKER */}
         <div className="mt-16 sm:mt-20 w-full">
           <OrderPipelineViewer
@@ -468,7 +476,14 @@ export default function App() {
           </div>
 
           {/* Direct Desk Actions */}
-          <div className="flex items-center gap-6 text-slate-400">
+          <div className="flex flex-wrap items-center gap-6 text-slate-400">
+            <a
+              href="#trade-community"
+              className="hover:text-amber-300 transition-colors flex items-center gap-1"
+            >
+              <Users className="w-3 h-3" />
+              <span>Community Hub</span>
+            </a>
             <button
               type="button"
               onClick={() => handleOpenOrderModal('export_agro')}
@@ -516,7 +531,11 @@ export default function App() {
       <AiOrderPlacementModal
         isOpen={isOrderModalOpen}
         initialCorridor={orderModalCorridor}
-        onClose={() => setIsOrderModalOpen(false)}
+        initialPrompt={orderModalPresetPrompt}
+        onClose={() => {
+          setIsOrderModalOpen(false);
+          setOrderModalPresetPrompt('');
+        }}
         onOrderPlaced={handleOrderPlaced}
       />
       <AdminCentreModal

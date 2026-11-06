@@ -24,4 +24,5 @@ export interface AdminMetricsResponse {
   activeVisitorsNow: number;
   recentVisitors: VisitorSession[];
   waitlist: WaitlistRegistration[];
+  communityPostsCount?: number;
 }

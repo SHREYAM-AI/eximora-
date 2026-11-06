@@ -72,6 +72,7 @@ export function AdminCentreModal({
           activeVisitorsNow: data.activeVisitorsNow || 1,
           recentVisitors: Array.isArray(data.recentVisitors) ? data.recentVisitors : [],
           waitlist: Array.isArray(data.waitlist) ? data.waitlist : [],
+          communityPostsCount: data.communityPostsCount || 0,
         });
       }
     } catch (err) {

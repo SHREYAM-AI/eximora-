@@ -21,6 +21,7 @@ interface AiOrderPlacementModalProps {
   onClose: () => void;
   onOrderPlaced: (order: TradeOrder) => void;
   initialCorridor?: TradeCorridor;
+  initialPrompt?: string;
 }
 
 const SAMPLE_PROMPTS = [
@@ -55,13 +56,22 @@ export function AiOrderPlacementModal({
   onClose,
   onOrderPlaced,
   initialCorridor = 'export_agro',
+  initialPrompt = '',
 }: AiOrderPlacementModalProps) {
   const [corridor, setCorridor] = useState<TradeCorridor>(initialCorridor);
   const [mode, setMode] = useState<'natural' | 'structured'>('natural');
-  const [promptInput, setPromptInput] = useState('');
+  const [promptInput, setPromptInput] = useState(initialPrompt);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdOrder, setCreatedOrder] = useState<TradeOrder | null>(null);
   const [error, setError] = useState('');
+
+  // Update promptInput when initialPrompt changes on open
+  React.useEffect(() => {
+    if (isOpen) {
+      if (initialPrompt) setPromptInput(initialPrompt);
+      if (initialCorridor) setCorridor(initialCorridor);
+    }
+  }, [isOpen, initialPrompt, initialCorridor]);
 
   // Structured form state
   const [productName, setProductName] = useState('');
