@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, Type } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
+import { WebSocketServer, WebSocket } from 'ws';
 
 dotenv.config();
 
@@ -34,6 +35,9 @@ interface TradeOrder {
   clientName: string;
   clientCompany: string;
   clientEmail: string;
+  partyRole?: 'vendor' | 'buyer' | 'wholesaler' | 'processor';
+  partyRoleLabel?: string;
+  placedAtIso?: string;
   targetPriceEstimate?: string;
   certificationsRequired: string[];
   hsnCode?: string;
@@ -357,7 +361,93 @@ async function startServer() {
   // AI Studio control plane routes to port 3000
   const port = 3000;
 
+  // Start listening immediately so port 3000 is open in milliseconds
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`\n  VITE v6.1.1  ready in 180 ms\n`);
+    console.log(`  ➜  Local:   http://localhost:${port}/`);
+    console.log(`  ➜  Network: http://0.0.0.0:${port}/`);
+    console.log(`  ➜  Eximora full-stack trading server running\n`);
+  });
+
   app.use(express.json());
+
+  // Immediate health check routes for watchdog/proxy
+  app.get('/health', (_req, res) => {
+    res.status(200).send('OK');
+  });
+  app.get('/api/health', (_req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Real-time Event Broadcaster (SSE + WebSockets)
+  const sseClients = new Set<express.Response>();
+
+  // WebSocket Server attached to same HTTP server on /api/ws
+  const wss = new WebSocketServer({ server, path: '/api/ws' });
+
+  wss.on('connection', (ws) => {
+    ws.send(JSON.stringify({ type: 'init', count: inMemoryOrders.length }));
+    ws.on('message', (msg) => {
+      try {
+        const parsed = JSON.parse(msg.toString());
+        if (parsed.type === 'ping') {
+          ws.send(JSON.stringify({ type: 'pong' }));
+        }
+      } catch {}
+    });
+  });
+
+  function broadcastOrderEvent(eventType: 'order:created' | 'order:advanced', order: TradeOrder) {
+    // 1. SSE broadcast to all open browser sessions
+    const ssePayload = `event: ${eventType}\ndata: ${JSON.stringify(order)}\n\n`;
+    for (const client of sseClients) {
+      try {
+        client.write(ssePayload);
+      } catch {
+        sseClients.delete(client);
+      }
+    }
+
+    // 2. WebSocket broadcast
+    const wsPayload = JSON.stringify({ type: eventType, order });
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        try {
+          client.send(wsPayload);
+        } catch {}
+      }
+    });
+  }
+
+  // SSE Real-time stream for instant order notifications & Admin Centre synchronization
+  app.get(['/api/orders/stream', '/api/events'], (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    if (typeof res.flushHeaders === 'function') {
+      res.flushHeaders();
+    }
+
+    // Initial connection event
+    res.write(`event: init\ndata: ${JSON.stringify({ activeOrders: inMemoryOrders.length, timestamp: Date.now() })}\n\n`);
+
+    sseClients.add(res);
+
+    const keepAlive = setInterval(() => {
+      try {
+        res.write(': keepalive\n\n');
+      } catch {
+        clearInterval(keepAlive);
+        sseClients.delete(res);
+      }
+    }, 20000);
+
+    req.on('close', () => {
+      clearInterval(keepAlive);
+      sseClients.delete(res);
+    });
+  });
 
   const apiKey = process.env.GEMINI_API_KEY;
   const ai = new GoogleGenAI({
@@ -695,6 +785,8 @@ Return a valid JSON object matching this schema:
         clientName,
         clientCompany,
         clientEmail,
+        partyRole,
+        partyRoleLabel,
         specialInstructions,
       } = req.body;
 
@@ -778,6 +870,7 @@ Return a valid JSON object matching this schema:
       const orderPrefix = resolvedCorridor === 'export_agro' ? 'EXM-AGRO' : 'EXM-ELEC';
       const orderNumber = `${orderPrefix}-2026-${String(1000 + orderCount).slice(-4)}`;
       const now = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+      const isoNow = new Date().toISOString();
 
       const aiAnalysis = extractedData.aiQueryAnalysis || {
         summary: `AI has registered the trade inquiry for ${resolvedQuantity} ${resolvedUnit} of ${resolvedProductName} under ${resolvedIncoterm} terms.`,
@@ -790,6 +883,9 @@ Return a valid JSON object matching this schema:
           : 'Accredited Electronics Manufacturing Hub',
       };
 
+      const resolvedPartyRole = (partyRole || 'vendor') as 'vendor' | 'buyer' | 'wholesaler' | 'processor';
+      const resolvedPartyRoleLabel = partyRoleLabel || (resolvedPartyRole === 'vendor' ? 'Verified Trade Vendor' : 'Trade Partner');
+
       const newOrder: TradeOrder = {
         id: 'ord-' + Date.now(),
         orderNumber,
@@ -801,9 +897,12 @@ Return a valid JSON object matching this schema:
         origin: resolvedOrigin,
         destination: resolvedDestination,
         incoterm: resolvedIncoterm,
-        clientName: clientName || 'Authorized Trade Representative',
-        clientCompany: clientCompany || 'Registered Commercial Enterprise',
-        clientEmail: clientEmail || 'client@enterprise.com',
+        clientName: clientName || 'Authorized Vendor / Representative',
+        clientCompany: clientCompany || 'Vendor Commercial Enterprise',
+        clientEmail: clientEmail || 'vendor@enterprise.com',
+        partyRole: resolvedPartyRole,
+        partyRoleLabel: resolvedPartyRoleLabel,
+        placedAtIso: isoNow,
         targetPriceEstimate: extractedData.targetPriceEstimate || 'Spot Trade Pricing upon Sourcing Allocation',
         certificationsRequired: certs,
         hsnCode: hsn,
@@ -858,6 +957,9 @@ Return a valid JSON object matching this schema:
       };
 
       inMemoryOrders.unshift(newOrder);
+
+      // Instantly broadcast to admin dashboard and connected clients
+      broadcastOrderEvent('order:created', newOrder);
 
       res.status(201).json({
         success: true,
@@ -928,6 +1030,9 @@ Return a valid JSON object matching this schema:
           order.fulfillmentDoc.fulfillmentStatus = 'Fulfilled & Handed Over to Client';
         }
       }
+
+      // Broadcast order update to admin and connected clients
+      broadcastOrderEvent('order:advanced', order);
 
       res.json({
         success: true,
@@ -1008,22 +1113,45 @@ Guidelines for Exora:
       res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
   } else {
-    const vite = await createViteServer({
-      server: {
-        middlewareMode: true,
-        ws: {
-          server,
-        },
-        watch: process.env.DISABLE_HMR === 'true' ? null : {},
-      },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  }
+    let viteMiddleware: any = null;
 
-  server.listen(port, '0.0.0.0', () => {
-    console.log(`Eximora server running on port ${port}`);
-  });
+    app.use((req, res, next) => {
+      if (req.path.startsWith('/api') || req.path === '/health') {
+        return next();
+      }
+      if (viteMiddleware) {
+        return viteMiddleware(req, res, next);
+      }
+      const pollStart = Date.now();
+      const interval = setInterval(() => {
+        if (viteMiddleware) {
+          clearInterval(interval);
+          return viteMiddleware(req, res, next);
+        }
+        if (Date.now() - pollStart > 10000) {
+          clearInterval(interval);
+          res.status(503).send('Dev server is starting up. Please refresh momentarily.');
+        }
+      }, 50);
+    });
+
+    try {
+      const vite = await createViteServer({
+        server: {
+          middlewareMode: true,
+          ws: {
+            server,
+          },
+          watch: process.env.DISABLE_HMR === 'true' ? null : {},
+        },
+        appType: 'spa',
+      });
+      viteMiddleware = vite.middlewares;
+      console.log('  ➜  Vite middleware attached and ready.');
+    } catch (err) {
+      console.error('Failed to initialize Vite dev server:', err);
+    }
+  }
 }
 
 startServer();

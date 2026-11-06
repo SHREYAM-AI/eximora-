@@ -38,11 +38,18 @@ export function AmbientCanvas() {
     // Particle setup
     const particleCount = Math.min(Math.floor((width * height) / 18000), 75);
     const particles: Particle[] = [];
-    const colors = [
-      'rgba(217, 180, 126,', // warm amber/champagne gold
-      'rgba(240, 240, 245,', // titanium pearl
-      'rgba(180, 195, 215,', // icy platinum
-    ];
+    const isDark = document.documentElement.classList.contains('dark');
+    const colors = isDark
+      ? [
+          'rgba(217, 180, 126,', // warm amber/champagne gold
+          'rgba(240, 240, 245,', // titanium pearl
+          'rgba(180, 195, 215,', // icy platinum
+        ]
+      : [
+          'rgba(180, 130, 60,',  // warm bronze
+          'rgba(100, 116, 139,', // soft slate
+          'rgba(190, 150, 90,',  // golden ochre
+        ];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -73,13 +80,15 @@ export function AmbientCanvas() {
 
     const render = () => {
       t += 0.008;
+      const currentlyDark = document.documentElement.classList.contains('dark');
+
       // Smooth mouse follow
       mouseX += (targetMouseX - mouseX) * 0.05;
       mouseY += (targetMouseY - mouseY) * 0.05;
 
       ctx.clearRect(0, 0, width, height);
 
-      // Deep atmospheric vignette
+      // Atmospheric vignette
       const radialGradient = ctx.createRadialGradient(
         mouseX,
         mouseY,
@@ -88,9 +97,15 @@ export function AmbientCanvas() {
         height / 2,
         Math.max(width, height) * 0.75
       );
-      radialGradient.addColorStop(0, 'rgba(212, 175, 55, 0.035)');
-      radialGradient.addColorStop(0.4, 'rgba(120, 100, 140, 0.015)');
-      radialGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      if (currentlyDark) {
+        radialGradient.addColorStop(0, 'rgba(212, 175, 55, 0.035)');
+        radialGradient.addColorStop(0.4, 'rgba(120, 100, 140, 0.015)');
+        radialGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      } else {
+        radialGradient.addColorStop(0, 'rgba(217, 119, 6, 0.03)');
+        radialGradient.addColorStop(0.4, 'rgba(220, 200, 180, 0.015)');
+        radialGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      }
 
       ctx.fillStyle = radialGradient;
       ctx.fillRect(0, 0, width, height);
@@ -105,9 +120,11 @@ export function AmbientCanvas() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 130) {
-            const lineAlpha = (1 - dist / 130) * 0.12;
+            const lineAlpha = (1 - dist / 130) * (currentlyDark ? 0.12 : 0.09);
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(215, 195, 160, ${lineAlpha})`;
+            ctx.strokeStyle = currentlyDark
+              ? `rgba(215, 195, 160, ${lineAlpha})`
+              : `rgba(160, 120, 60, ${lineAlpha})`;
             ctx.lineWidth = 0.6;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);

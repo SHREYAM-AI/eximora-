@@ -152,8 +152,8 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
           <div className="relative group">
             {/* Unread / Invitation Pill */}
             {hasUnread && (
-              <div className="absolute -top-10 right-0 whitespace-nowrap bg-black/90 border border-amber-400/30 text-amber-200 text-[11px] font-mono px-3 py-1 rounded-full shadow-lg shadow-black/50 animate-bounce pointer-events-none flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-amber-300" />
+              <div className="absolute -top-10 right-0 whitespace-nowrap bg-white/95 dark:bg-black/90 border border-amber-500/40 dark:border-amber-400/30 text-amber-900 dark:text-amber-200 text-[11px] font-mono px-3 py-1 rounded-full shadow-lg shadow-black/20 dark:shadow-black/50 animate-bounce pointer-events-none flex items-center gap-1.5 font-medium">
+                <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-300" />
                 <span>Trade Concierge Online</span>
               </div>
             )}
@@ -161,22 +161,22 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
             <button
               type="button"
               onClick={() => setIsOpen(true)}
-              className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#12131A] via-[#161822] to-[#12131A] border border-amber-400/40 hover:border-amber-400/80 text-white shadow-2xl shadow-amber-950/40 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer backdrop-blur-md"
+              className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-white dark:bg-gradient-to-r dark:from-[#12131A] dark:via-[#161822] dark:to-[#12131A] border border-amber-500/40 dark:border-amber-400/40 hover:border-amber-500 dark:hover:border-amber-400/80 text-slate-900 dark:text-white shadow-xl shadow-slate-900/10 dark:shadow-amber-950/40 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer backdrop-blur-md"
               aria-label="Open Exora AI Trade Concierge"
             >
               <div className="relative">
-                <div className="w-7 h-7 rounded-full bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-300">
+                <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-400/15 border border-amber-300 dark:border-amber-400/40 flex items-center justify-center text-amber-800 dark:text-amber-300">
                   <Bot className="w-4 h-4" />
                 </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-black" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-black" />
               </div>
 
               <div className="text-left hidden sm:block">
                 <div className="flex items-center gap-1.5 leading-none">
-                  <span className="text-xs font-semibold tracking-wide text-white font-serif">Exora</span>
-                  <span className="text-[10px] font-mono text-amber-300/80">AI</span>
+                  <span className="text-xs font-semibold tracking-wide text-slate-900 dark:text-white font-serif">Exora</span>
+                  <span className="text-[10px] font-mono text-amber-800 dark:text-amber-300/80 font-medium">AI</span>
                 </div>
-                <span className="text-[10px] text-slate-400 block mt-0.5">Trade Concierge</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">Trade Concierge</span>
               </div>
             </button>
           </div>
@@ -188,25 +188,25 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
         <div
           role="dialog"
           aria-label="Exora Chatbot"
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[85vh] bg-[#0A0B10] border border-white/15 rounded-2xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-bottom-6 duration-200"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[85vh] bg-white/95 dark:bg-[#0A0B10] border border-slate-200 dark:border-white/15 rounded-2xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-bottom-6 duration-200"
         >
           {/* Header */}
-          <div className="p-4 bg-white/[0.03] border-b border-white/10 flex items-center justify-between">
+          <div className="p-4 bg-slate-50/80 dark:bg-white/[0.03] border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-300/20 to-amber-500/10 border border-amber-400/40 flex items-center justify-center text-amber-200">
+                <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-gradient-to-br dark:from-amber-300/20 dark:to-amber-500/10 border border-amber-300 dark:border-amber-400/40 flex items-center justify-center text-amber-800 dark:text-amber-200">
                   <Bot className="w-4 h-4" />
                 </div>
-                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-black" />
+                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-black" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-serif font-semibold text-white">Exora</h3>
-                  <span className="text-[10px] font-mono tracking-wider uppercase text-amber-300/80 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
+                  <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">Exora</h3>
+                  <span className="text-[10px] font-mono tracking-wider uppercase text-amber-800 dark:text-amber-300/80 bg-amber-50 dark:bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-400/20 font-medium">
                     Trade AI
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400 block">Eximora Trade Concierge</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Eximora Trade Concierge</span>
               </div>
             </div>
 
@@ -214,7 +214,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
               <button
                 type="button"
                 onClick={handleResetChat}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors border border-transparent hover:border-white/10"
+                className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors border border-transparent hover:border-slate-300 dark:hover:border-white/10 cursor-pointer"
                 title="Restart dialogue"
                 aria-label="Restart dialogue"
               >
@@ -223,7 +223,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors border border-transparent hover:border-white/10"
+                className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors border border-transparent hover:border-slate-300 dark:hover:border-white/10 cursor-pointer"
                 title="Minimize Exora"
                 aria-label="Minimize Exora"
               >
@@ -232,7 +232,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors border border-transparent hover:border-white/10"
+                className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors border border-transparent hover:border-slate-300 dark:hover:border-white/10 cursor-pointer"
                 title="Close Exora"
                 aria-label="Close Exora"
               >
@@ -249,7 +249,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'assistant' && (
-                  <div className="w-6 h-6 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-400/15 border border-amber-300 dark:border-amber-400/30 flex items-center justify-center text-amber-800 dark:text-amber-300 shrink-0 mt-0.5">
                     <Bot className="w-3 h-3" />
                   </div>
                 )}
@@ -257,14 +257,14 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 <div
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-amber-400/15 border border-amber-400/30 text-white rounded-tr-none'
-                      : 'bg-white/[0.04] border border-white/10 text-slate-200 rounded-tl-none'
+                      ? 'bg-amber-100 dark:bg-amber-400/15 border border-amber-300 dark:border-amber-400/30 text-slate-900 dark:text-white rounded-tr-none'
+                      : 'bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200 rounded-tl-none font-light'
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                   <span
                     className={`block text-[9px] mt-1.5 font-mono ${
-                      msg.role === 'user' ? 'text-amber-200/60 text-right' : 'text-slate-500'
+                      msg.role === 'user' ? 'text-amber-800/80 dark:text-amber-200/60 text-right font-medium' : 'text-slate-500'
                     }`}
                   >
                     {msg.timestamp}
@@ -272,7 +272,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 </div>
 
                 {msg.role === 'user' && (
-                  <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-slate-200 shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 border border-slate-300 dark:border-white/20 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 mt-0.5">
                     <User className="w-3 h-3" />
                   </div>
                 )}
@@ -281,13 +281,13 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
 
             {isLoading && (
               <div className="flex gap-2.5 justify-start">
-                <div className="w-6 h-6 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-400/15 border border-amber-300 dark:border-amber-400/30 flex items-center justify-center text-amber-800 dark:text-amber-300 shrink-0 mt-0.5">
                   <Bot className="w-3 h-3" />
                 </div>
-                <div className="bg-white/[0.04] border border-white/10 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse [animation-delay:200ms]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse [animation-delay:400ms]" />
+                <div className="bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-300 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-300 animate-pulse [animation-delay:200ms]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-300 animate-pulse [animation-delay:400ms]" />
                 </div>
               </div>
             )}
@@ -297,8 +297,8 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
 
           {/* Quick Suggestions (Shown if only initial message) */}
           {messages.length <= 2 && !isLoading && (
-            <div className="px-4 pb-2 pt-1 border-t border-white/5">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block mb-1.5">
+            <div className="px-4 pb-2 pt-1 border-t border-slate-200 dark:border-white/5">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block mb-1.5 font-semibold">
                 Inquiry prompts
               </span>
               <div className="flex flex-col gap-1.5">
@@ -307,10 +307,10 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                     key={suggestion}
                     type="button"
                     onClick={() => handleSend(suggestion)}
-                    className="text-left px-2.5 py-1.5 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-[11px] text-slate-300 hover:text-white transition-colors flex items-center justify-between group cursor-pointer"
+                    className="text-left px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.06] border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/15 text-[11px] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-between group cursor-pointer shadow-xs"
                   >
                     <span className="truncate">{suggestion}</span>
-                    <ArrowRight className="w-3 h-3 text-slate-500 group-hover:text-amber-300 shrink-0 transition-colors" />
+                    <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-300 shrink-0 transition-colors" />
                   </button>
                 ))}
               </div>
@@ -318,7 +318,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
           )}
 
           {/* Input Bar */}
-          <div className="p-3 bg-white/[0.02] border-t border-white/10">
+          <div className="p-3 bg-slate-50/70 dark:bg-white/[0.02] border-t border-slate-200 dark:border-white/10">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -332,13 +332,13 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask Exora about bilateral trade corridors..."
-                className="flex-1 bg-white/[0.04] border border-white/10 focus:border-amber-400/50 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none transition-colors"
+                className="flex-1 bg-white dark:bg-white/[0.04] border border-slate-300 dark:border-white/10 focus:border-amber-500 dark:focus:border-amber-400/50 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none transition-colors shadow-xs"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="p-2 bg-gradient-to-r from-amber-200 to-amber-300 hover:from-amber-100 hover:to-amber-200 text-black rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                className="p-2 bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 text-black rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-xs"
                 aria-label="Send message to Exora"
               >
                 <Send className="w-3.5 h-3.5" />

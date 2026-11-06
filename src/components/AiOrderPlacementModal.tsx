@@ -83,6 +83,7 @@ export function AiOrderPlacementModal({
   const [clientCompany, setClientCompany] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientName, setClientName] = useState('');
+  const [partyRole, setPartyRole] = useState<'vendor' | 'buyer' | 'wholesaler' | 'processor'>('vendor');
 
   if (!isOpen) return null;
 
@@ -111,6 +112,15 @@ export function AiOrderPlacementModal({
     setIsSubmitting(true);
 
     try {
+      const partyRoleLabel =
+        partyRole === 'vendor'
+          ? 'Verified Trade Vendor'
+          : partyRole === 'processor'
+          ? 'Agricultural Processor'
+          : partyRole === 'wholesaler'
+          ? 'Wholesale Retailer'
+          : 'Commercial Buyer';
+
       const payload = {
         naturalLanguagePrompt: mode === 'natural' ? promptInput : undefined,
         corridor,
@@ -120,9 +130,11 @@ export function AiOrderPlacementModal({
         origin: mode === 'structured' ? origin : undefined,
         destination: mode === 'structured' ? destination : undefined,
         incoterm: mode === 'structured' ? incoterm : undefined,
-        clientName: clientName.trim() || 'Client Trade Account',
-        clientCompany: clientCompany.trim() || '',
-        clientEmail: clientEmail.trim() || '',
+        clientName: clientName.trim() || (partyRole === 'vendor' ? 'Verified Trade Vendor' : 'Trade Account'),
+        clientCompany: clientCompany.trim() || (partyRole === 'vendor' ? 'Vendor Enterprise' : 'Commercial Partner'),
+        clientEmail: clientEmail.trim() || 'trade@enterprise.com',
+        partyRole,
+        partyRoleLabel,
         specialInstructions: mode === 'natural' ? promptInput : 'Commercial packaging and compliance verified.',
       };
 
@@ -178,9 +190,19 @@ export function AiOrderPlacementModal({
             ? 'International Destination Port'
             : 'India Port/ICD',
         incoterm: mode === 'structured' ? incoterm : corridor === 'export_agro' ? 'CIF' : 'DDP',
-        clientName: clientName || 'Client Trade Account',
-        clientCompany: clientCompany || '',
-        clientEmail: clientEmail || '',
+        clientName: clientName || (partyRole === 'vendor' ? 'Verified Trade Vendor' : 'Client Trade Account'),
+        clientCompany: clientCompany || (partyRole === 'vendor' ? 'Vendor Enterprise' : 'Commercial Partner'),
+        clientEmail: clientEmail || 'trade@enterprise.com',
+        partyRole,
+        partyRoleLabel:
+          partyRole === 'vendor'
+            ? 'Verified Trade Vendor'
+            : partyRole === 'processor'
+            ? 'Agricultural Processor'
+            : partyRole === 'wholesaler'
+            ? 'Wholesale Retailer'
+            : 'Commercial Buyer',
+        placedAtIso: new Date().toISOString(),
         certificationsRequired:
           corridor === 'export_agro'
             ? ['APEDA Phytosanitary', 'FSSAI Laboratory Certificate', 'ISO 22000']
@@ -266,22 +288,22 @@ export function AiOrderPlacementModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="order-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-black/85 backdrop-blur-md transition-opacity animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-black/60 dark:bg-black/85 backdrop-blur-md transition-opacity animate-in fade-in duration-200"
     >
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
 
-      <div className="relative w-full max-w-3xl bg-[#0B0C12] border border-white/15 rounded-2xl p-5 sm:p-8 text-slate-200 shadow-2xl z-10 max-h-[92vh] overflow-y-auto">
+      <div className="relative w-full max-w-3xl bg-white dark:bg-[#0B0C12] border border-slate-200 dark:border-white/15 rounded-2xl p-5 sm:p-8 text-slate-900 dark:text-slate-200 shadow-2xl z-10 max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-5 border-b border-white/10">
+        <div className="flex items-center justify-between pb-5 border-b border-slate-200 dark:border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 border border-amber-400/30 flex items-center justify-center text-amber-300">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 border border-amber-500/30 dark:border-amber-400/30 flex items-center justify-center text-amber-700 dark:text-amber-300">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] font-mono tracking-widest uppercase text-amber-300/80">
+              <span className="text-[11px] font-mono tracking-widest uppercase text-amber-800 dark:text-amber-300/80 font-medium">
                 AI Trade Operations
               </span>
-              <h2 id="order-modal-title" className="text-xl sm:text-2xl font-serif text-white tracking-wide">
+              <h2 id="order-modal-title" className="text-xl sm:text-2xl font-serif text-slate-900 dark:text-white tracking-wide">
                 AI Order Placement System
               </h2>
             </div>
@@ -290,7 +312,7 @@ export function AiOrderPlacementModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg transition-colors border border-white/5 hover:border-white/15"
+            className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/15 cursor-pointer"
             aria-label="Close order placement"
           >
             <X className="w-5 h-5" />
@@ -300,70 +322,70 @@ export function AiOrderPlacementModal({
         {/* Success View: Registered Query Dossier */}
         {createdOrder ? (
           <div className="py-6 space-y-6 animate-in fade-in duration-300">
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-400 font-semibold block">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-800 dark:text-emerald-400 font-semibold block">
                     Phase 1: Query Registered Successfully
                   </span>
-                  <p className="text-sm text-slate-200">
-                    Your trade order <span className="font-mono font-bold text-white">{createdOrder.orderNumber}</span> is officially indexed and queued for execution.
+                  <p className="text-sm text-slate-700 dark:text-slate-200">
+                    Your trade order <span className="font-mono font-bold text-slate-900 dark:text-white">{createdOrder.orderNumber}</span> is officially indexed and queued for execution.
                   </p>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="text-[10px] font-mono uppercase text-slate-400 block">Current Stage</span>
-                <span className="inline-block px-2.5 py-1 text-xs font-mono font-medium rounded-md bg-amber-400/15 border border-amber-400/30 text-amber-300">
+                <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Current Stage</span>
+                <span className="inline-block px-2.5 py-1 text-xs font-mono font-medium rounded-md bg-amber-50 dark:bg-amber-400/15 border border-amber-300 dark:border-amber-400/30 text-amber-800 dark:text-amber-300">
                   1. Registered Query
                 </span>
               </div>
             </div>
 
             {/* AI Query Analysis Box */}
-            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
-              <div className="flex items-center justify-between text-xs border-b border-white/5 pb-2">
-                <span className="font-mono uppercase text-amber-300 flex items-center gap-1.5 font-semibold">
+            <div className="p-5 rounded-2xl bg-slate-50/80 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3 shadow-xs">
+              <div className="flex items-center justify-between text-xs border-b border-slate-200 dark:border-white/5 pb-2">
+                <span className="font-mono uppercase text-amber-800 dark:text-amber-300 flex items-center gap-1.5 font-semibold">
                   <FileText className="w-3.5 h-3.5" />
                   AI Specification Dossier
                 </span>
-                <span className="text-slate-400 font-mono text-[11px]">
+                <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                   HSN: {createdOrder.hsnCode} · Risk: {createdOrder.aiQueryAnalysis.riskAssessment}
                 </span>
               </div>
 
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-light">
                 {createdOrder.aiQueryAnalysis.summary}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
-                <div className="p-3 rounded-lg bg-black/40 border border-white/5">
+                <div className="p-3 rounded-lg bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 shadow-xs">
                   <span className="text-[10px] uppercase font-mono text-slate-500 block">Commodity & Volume</span>
-                  <span className="text-white font-medium text-sm mt-0.5 block">
+                  <span className="text-slate-900 dark:text-white font-medium text-sm mt-0.5 block">
                     {createdOrder.quantity} {createdOrder.unit}
                   </span>
-                  <span className="text-slate-400 text-[11px]">{createdOrder.productName}</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[11px]">{createdOrder.productName}</span>
                 </div>
 
-                <div className="p-3 rounded-lg bg-black/40 border border-white/5">
+                <div className="p-3 rounded-lg bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 shadow-xs">
                   <span className="text-[10px] uppercase font-mono text-slate-500 block">Logistics Route & Incoterm</span>
-                  <span className="text-amber-200 font-medium text-sm mt-0.5 block">
+                  <span className="text-amber-800 dark:text-amber-200 font-medium text-sm mt-0.5 block">
                     {createdOrder.incoterm} · {createdOrder.destination}
                   </span>
-                  <span className="text-slate-400 text-[11px]">Origin: {createdOrder.origin}</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[11px]">Origin: {createdOrder.origin}</span>
                 </div>
               </div>
 
               {/* Asset-light plan */}
-              <div className="p-3 rounded-xl bg-amber-400/[0.04] border border-amber-400/15 text-xs space-y-1">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-amber-300 block font-semibold">
+              <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-400/[0.04] border border-amber-200 dark:border-amber-400/15 text-xs space-y-1">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-amber-800 dark:text-amber-300 block font-semibold">
                   Eximora Asset-Light Sourcing Strategy
                 </span>
-                <p className="text-slate-300">{createdOrder.aiQueryAnalysis.assetLightAction}</p>
-                <p className="text-slate-400 text-[11px] pt-1 font-mono">
+                <p className="text-slate-700 dark:text-slate-300 font-light">{createdOrder.aiQueryAnalysis.assetLightAction}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-[11px] pt-1 font-mono">
                   Network: {createdOrder.aiQueryAnalysis.matchedNetwork}
                 </p>
               </div>
@@ -377,7 +399,7 @@ export function AiOrderPlacementModal({
                   {createdOrder.certificationsRequired.map((cert) => (
                     <span
                       key={cert}
-                      className="px-2 py-0.5 text-[11px] font-mono bg-white/[0.05] border border-white/10 rounded text-slate-300"
+                      className="px-2 py-0.5 text-[11px] font-mono bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded text-slate-700 dark:text-slate-300"
                     >
                       {cert}
                     </span>
@@ -387,20 +409,20 @@ export function AiOrderPlacementModal({
             </div>
 
             {/* Lifecycle Pipeline Progress Indicator */}
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
-              <span className="text-[11px] font-mono uppercase text-slate-400 block mb-3">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10">
+              <span className="text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-3 font-semibold">
                 Lifecycle Progression Roadmap
               </span>
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="p-2.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+                <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
                   <span className="font-mono font-bold block text-sm">1. Registered</span>
-                  <span className="text-[10px] text-emerald-200/80">Query verified</span>
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-200/80">Query verified</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 text-slate-400">
+                <div className="p-2.5 rounded-lg bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
                   <span className="font-mono font-bold block text-sm">2. Execution</span>
                   <span className="text-[10px]">Sourcing & Certs</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 text-slate-400">
+                <div className="p-2.5 rounded-lg bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
                   <span className="font-mono font-bold block text-sm">3. Fulfillment</span>
                   <span className="text-[10px]">Handover & Delivery</span>
                 </div>
@@ -408,11 +430,11 @@ export function AiOrderPlacementModal({
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-white/10">
               <button
                 type="button"
                 onClick={handleResetForNew}
-                className="w-full sm:w-auto px-4 py-2.5 text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2.5 text-xs text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Place Another Order</span>
@@ -421,7 +443,7 @@ export function AiOrderPlacementModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full sm:w-auto px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-amber-200 to-amber-300 hover:from-amber-100 hover:to-amber-200 rounded-lg transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 rounded-lg transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Track in Execution Pipeline</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -433,7 +455,7 @@ export function AiOrderPlacementModal({
           <form onSubmit={handleSubmit} className="mt-5 space-y-5">
             {/* Corridor Selection */}
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">
+              <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-semibold">
                 Select Bilateral Trade Corridor
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -445,16 +467,16 @@ export function AiOrderPlacementModal({
                   }}
                   className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                     corridor === 'export_agro'
-                      ? 'bg-amber-400/[0.08] border-amber-400/60 shadow-lg shadow-amber-950/20'
-                      : 'bg-white/[0.02] border-white/10 hover:border-white/20 text-slate-400'
+                      ? 'bg-amber-50 dark:bg-amber-400/[0.08] border-amber-400 dark:border-amber-400/60 shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <div className="flex items-center gap-2 text-xs font-mono uppercase font-semibold text-emerald-400 mb-1">
+                  <div className="flex items-center gap-2 text-xs font-mono uppercase font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
                     <Wheat className="w-4 h-4" />
                     <span>Export Corridor (India → World)</span>
                   </div>
-                  <h4 className="text-sm font-serif font-medium text-white">Food & Agricultural Products</h4>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <h4 className="text-sm font-serif font-medium text-slate-900 dark:text-white">Food & Agricultural Products</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                     Sourced from certified Indian farmers & processors (Basmati rice, spices, pulses, processed food).
                   </p>
                 </button>
@@ -467,16 +489,16 @@ export function AiOrderPlacementModal({
                   }}
                   className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                     corridor === 'import_electronics'
-                      ? 'bg-amber-400/[0.08] border-amber-400/60 shadow-lg shadow-amber-950/20'
-                      : 'bg-white/[0.02] border-white/10 hover:border-white/20 text-slate-400'
+                      ? 'bg-amber-50 dark:bg-amber-400/[0.08] border-amber-400 dark:border-amber-400/60 shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <div className="flex items-center gap-2 text-xs font-mono uppercase font-semibold text-amber-300 mb-1">
+                  <div className="flex items-center gap-2 text-xs font-mono uppercase font-semibold text-amber-800 dark:text-amber-300 mb-1">
                     <Cpu className="w-4 h-4" />
                     <span>Import Corridor (World → India)</span>
                   </div>
-                  <h4 className="text-sm font-serif font-medium text-white">Electronic Accessories</h4>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <h4 className="text-sm font-serif font-medium text-slate-900 dark:text-white">Electronic Accessories</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                     Imported for Indian wholesalers, retailers, and online sellers (GaN chargers, audio, cables).
                   </p>
                 </button>
@@ -484,15 +506,15 @@ export function AiOrderPlacementModal({
             </div>
 
             {/* Input Mode Switch */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
               <div className="flex items-center gap-2 text-xs">
                 <button
                   type="button"
                   onClick={() => setMode('natural')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     mode === 'natural'
-                      ? 'bg-white/10 text-white border border-white/15'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white border border-slate-300 dark:border-white/15'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   Natural Language AI Prompt
@@ -500,17 +522,17 @@ export function AiOrderPlacementModal({
                 <button
                   type="button"
                   onClick={() => setMode('structured')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     mode === 'structured'
-                      ? 'bg-white/10 text-white border border-white/15'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white border border-slate-300 dark:border-white/15'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   Guided Trade Form
                 </button>
               </div>
 
-              <span className="text-[10px] font-mono text-amber-300/80 hidden sm:inline">
+              <span className="text-[10px] font-mono text-amber-800 dark:text-amber-300/80 font-medium hidden sm:inline">
                 Asset-Light Sourcing · Certified Quality · Global Logistics
               </span>
             </div>
@@ -524,17 +546,17 @@ export function AiOrderPlacementModal({
                     value={promptInput}
                     onChange={(e) => setPromptInput(e.target.value)}
                     placeholder={`Describe your trade requirements in plain language... (e.g., "We want to order 20 Metric Tons of organic Basmati rice shipped to Jebel Ali under CIF terms with APEDA certification" or "Procure 5,000 units of 65W GaN dual-port chargers for retail in Delhi with BIS approval")`}
-                    className="w-full p-4 bg-white/[0.03] border border-white/15 focus:border-amber-400/50 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-colors resize-none leading-relaxed"
+                    className="w-full p-4 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/15 focus:border-amber-500 dark:focus:border-amber-400/50 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none transition-colors resize-none leading-relaxed shadow-xs"
                   />
                   <div className="absolute bottom-3 right-3 text-[10px] font-mono text-slate-500 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-300" />
                     <span>AI Trade Parser Active</span>
                   </div>
                 </div>
 
                 {/* Quick Sample Prompts */}
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block mb-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block mb-2 font-semibold">
                     Or select a pre-calibrated trade inquiry benchmark:
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -543,12 +565,12 @@ export function AiOrderPlacementModal({
                         key={idx}
                         type="button"
                         onClick={() => handleApplySample(sample.prompt, sample.corridor)}
-                        className="p-2.5 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/15 text-left text-xs transition-colors group cursor-pointer"
+                        className="p-2.5 rounded-lg bg-slate-50/70 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.06] border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/15 text-left text-xs transition-colors group cursor-pointer shadow-xs"
                       >
-                        <span className="text-amber-200/90 font-medium block truncate group-hover:text-amber-100">
+                        <span className="text-amber-800 dark:text-amber-200/90 font-semibold block truncate group-hover:text-amber-900 dark:group-hover:text-amber-100">
                           {sample.title}
                         </span>
-                        <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
+                        <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-1 mt-0.5">
                           {sample.prompt}
                         </p>
                       </button>
@@ -561,7 +583,7 @@ export function AiOrderPlacementModal({
               <div className="space-y-4 text-xs">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1">
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">
                       Product Name & Specification *
                     </label>
                     <input
@@ -574,28 +596,28 @@ export function AiOrderPlacementModal({
                           ? 'e.g. 1121 Extra Long Steam Basmati Rice'
                           : 'e.g. 65W GaN Dual USB-C Fast Wall Charger'
                       }
-                      className="w-full px-3.5 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-slate-300 font-medium mb-1">Quantity *</label>
+                      <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Quantity *</label>
                       <input
                         type="text"
                         required
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value)}
                         placeholder="e.g. 25"
-                        className="w-full px-3.5 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-medium mb-1">Unit</label>
+                      <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Unit</label>
                       <select
                         value={unit}
                         onChange={(e) => setUnit(e.target.value)}
-                        className="w-full px-3 py-2.5 bg-[#12131A] border border-white/10 rounded-lg text-white focus:outline-none focus:border-amber-400/50"
+                        className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#12131A] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                       >
                         <option value="Metric Tons">Metric Tons</option>
                         <option value="Units">Units</option>
@@ -609,34 +631,34 @@ export function AiOrderPlacementModal({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1">Origin Hub / Region</label>
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Origin Hub / Region</label>
                     <input
                       type="text"
                       value={origin}
                       onChange={(e) => setOrigin(e.target.value)}
                       placeholder={corridor === 'export_agro' ? 'e.g. Punjab / Haryana, India' : 'e.g. Shenzhen OEM Hub'}
-                      className="w-full px-3.5 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1">Destination Port / Hub *</label>
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Destination Port / Hub *</label>
                     <input
                       type="text"
                       required
                       value={destination}
                       onChange={(e) => setDestination(e.target.value)}
                       placeholder={corridor === 'export_agro' ? 'e.g. Port of Jebel Ali, Dubai' : 'e.g. Delhi ICD / Mumbai'}
-                      className="w-full px-3.5 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1">Incoterms</label>
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Incoterms</label>
                     <select
                       value={incoterm}
                       onChange={(e) => setIncoterm(e.target.value as any)}
-                      className="w-full px-3 py-2.5 bg-[#12131A] border border-white/10 rounded-lg text-white focus:outline-none focus:border-amber-400/50"
+                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#12131A] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                     >
                       <option value="CIF">CIF (Cost, Insurance & Freight)</option>
                       <option value="FOB">FOB (Free On Board)</option>
@@ -649,50 +671,109 @@ export function AiOrderPlacementModal({
               </div>
             )}
 
+            {/* Entity Role Selection (Vendor, Buyer, Wholesaler) */}
+            <div className="pt-2 border-t border-slate-200 dark:border-white/10 space-y-1.5">
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-amber-800 dark:text-amber-300 font-semibold">
+                Placing Order As:
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={() => setPartyRole('vendor')}
+                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                    partyRole === 'vendor'
+                      ? 'bg-amber-100 dark:bg-amber-400/20 border-amber-400 dark:border-amber-400 text-slate-900 dark:text-white font-semibold shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="block text-amber-800 dark:text-amber-300 font-bold">Vendor / Supplier</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">Supplying Goods</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPartyRole('processor')}
+                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                    partyRole === 'processor'
+                      ? 'bg-emerald-100 dark:bg-amber-400/20 border-emerald-400 dark:border-amber-400 text-slate-900 dark:text-white font-semibold shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="block text-emerald-700 dark:text-emerald-400 font-bold">Agro Processor</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">Farmer Cooperative</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPartyRole('wholesaler')}
+                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                    partyRole === 'wholesaler'
+                      ? 'bg-amber-100 dark:bg-amber-400/20 border-amber-400 dark:border-amber-400 text-slate-900 dark:text-white font-semibold shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="block text-slate-900 dark:text-white font-bold">Wholesaler</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">Domestic Retailing</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPartyRole('buyer')}
+                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                    partyRole === 'buyer'
+                      ? 'bg-amber-100 dark:bg-amber-400/20 border-amber-400 dark:border-amber-400 text-slate-900 dark:text-white font-semibold shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="block text-slate-900 dark:text-white font-bold">Overseas Buyer</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">Port Delivery</span>
+                </button>
+              </div>
+            </div>
+
             {/* Client Enterprise Contact */}
-            <div className="pt-2 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div className="pt-2 border-t border-slate-200 dark:border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1">Company / Entity Name</label>
+                <label className="block text-slate-600 dark:text-slate-400 mb-1 font-medium">
+                  {partyRole === 'vendor' ? 'Vendor / Company Name' : 'Company / Entity Name'}
+                </label>
                 <input
                   type="text"
                   value={clientCompany}
                   onChange={(e) => setClientCompany(e.target.value)}
-                  placeholder="e.g. Gulf Horizon Foodstuffs LLC"
-                  className="w-full px-3 py-2 bg-white/[0.02] border border-white/10 rounded-lg text-white placeholder-slate-600 focus:outline-none focus:border-amber-400/50"
+                  placeholder={partyRole === 'vendor' ? 'e.g. Amritsar Agro Cooperative' : 'e.g. Gulf Horizon Foodstuffs LLC'}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">Representative Name</label>
+                <label className="block text-slate-600 dark:text-slate-400 mb-1 font-medium">Representative Name</label>
                 <input
                   type="text"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  placeholder="e.g. Tariq Mansoor"
-                  className="w-full px-3 py-2 bg-white/[0.02] border border-white/10 rounded-lg text-white placeholder-slate-600 focus:outline-none focus:border-amber-400/50"
+                  placeholder="e.g. Tariq Mansoor / Harpreet Singh"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">Corporate Email Address</label>
+                <label className="block text-slate-600 dark:text-slate-400 mb-1 font-medium">Corporate Contact Email</label>
                 <input
                   type="email"
                   value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="procurement@gulfhorizon.com"
-                  className="w-full px-3 py-2 bg-white/[0.02] border border-white/10 rounded-lg text-white placeholder-slate-600 focus:outline-none focus:border-amber-400/50"
+                  placeholder="trade@enterprise.com"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                 />
               </div>
             </div>
 
             {error && (
-              <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3.5 py-2 rounded-lg">
+              <p className="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-3.5 py-2 rounded-lg">
                 {error}
               </p>
             )}
 
             {/* Submit Bar */}
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
               <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">
                 Execution pipeline: Register Query → Sourcing & Certify → Fulfill Handover
               </span>
@@ -700,7 +781,7 @@ export function AiOrderPlacementModal({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-xs font-semibold tracking-wider uppercase text-black bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 hover:from-amber-100 hover:to-amber-200 active:scale-[0.98] rounded-xl transition-all shadow-lg shadow-amber-950/30 disabled:opacity-50 cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-xs font-semibold tracking-wider uppercase text-black bg-gradient-to-r from-amber-300 via-amber-400 to-amber-300 hover:from-amber-200 hover:to-amber-300 active:scale-[0.98] rounded-xl transition-all shadow-xs disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">

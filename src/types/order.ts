@@ -25,6 +25,9 @@ export interface TradeOrder {
   clientName: string;
   clientCompany: string;
   clientEmail: string;
+  partyRole?: 'vendor' | 'buyer' | 'wholesaler' | 'processor';
+  partyRoleLabel?: string;
+  placedAtIso?: string;
   targetPriceEstimate?: string;
   certificationsRequired: string[];
   hsnCode?: string;

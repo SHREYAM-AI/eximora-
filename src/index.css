@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   :root {
@@ -9,8 +10,6 @@
   
   body {
     font-family: var(--font-body);
-    background-color: #060608;
-    color: #F1F5F9;
   }
 }
 
@@ -35,11 +34,17 @@
   animation: pulseSubtle 10s ease-in-out infinite;
 }
 
-/* Glass & Hairline Border utilities */
+/* Glass & Hairline Border utilities for dual themes */
 .hairline-border {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.dark .hairline-border {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .hairline-border-hover:hover {
+  border-color: rgba(0, 0, 0, 0.16);
+}
+.dark .hairline-border-hover:hover {
   border-color: rgba(255, 255, 255, 0.18);
 }

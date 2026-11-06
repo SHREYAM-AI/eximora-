@@ -98,7 +98,7 @@ export function SoundAmbiance() {
     <button
       type="button"
       onClick={toggleSound}
-      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs text-slate-400 hover:text-slate-100 transition-colors rounded-full border border-white/10 hover:border-white/25 bg-white/[0.02] backdrop-blur-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400/50"
+      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors rounded-full border border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/25 bg-white/80 dark:bg-white/[0.02] shadow-xs dark:shadow-none backdrop-blur-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400/50"
       aria-label={isPlaying ? 'Mute ambient sound' : 'Enable ambient sound'}
       title={isPlaying ? 'Mute ambient sound' : 'Enable ambient sound'}
     >
