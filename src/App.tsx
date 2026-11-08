@@ -15,8 +15,10 @@ import { OrderPipelineViewer } from './components/OrderPipelineViewer';
 import { MarketPerformanceDashboard } from './components/MarketPerformanceDashboard';
 import { TradeCommunityHub } from './components/TradeCommunityHub';
 import { AdminCentreModal } from './components/AdminCentreModal';
+import { IntroVideoModal } from './components/IntroVideoModal';
+import { IntroVideoShowcase } from './components/IntroVideoShowcase';
 import { TradeOrder, TradeCorridor } from './types/order';
-import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield, Users, X, Bell, Radio } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield, Users, X, Bell, Radio, Play, Film } from 'lucide-react';
 import { playVendorOrderChime } from './utils/audioAlert';
 import { ThemeToggle } from './components/ThemeToggle';
 
@@ -24,6 +26,8 @@ export default function App() {
   const [isManifestoOpen, setIsManifestoOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [videoChapterIndex, setVideoChapterIndex] = useState(0);
   const [orderModalCorridor, setOrderModalCorridor] = useState<TradeCorridor>('export_agro');
   const [orderModalPresetPrompt, setOrderModalPresetPrompt] = useState<string>('');
   const [inquiryModalState, setInquiryModalState] = useState<{
@@ -131,6 +135,11 @@ export default function App() {
     setOrderModalCorridor(corridor);
     setOrderModalPresetPrompt(presetPrompt);
     setIsOrderModalOpen(true);
+  };
+
+  const handleOpenVideoModal = (chapterIndex: number = 0) => {
+    setVideoChapterIndex(chapterIndex);
+    setIsVideoModalOpen(true);
   };
 
   const handleOrderPlaced = (newOrder: TradeOrder) => {
@@ -252,7 +261,16 @@ export default function App() {
         </a>
 
         {/* Zone 2: Concise single-line text navigation links */}
-        <nav className="hidden md:flex items-center gap-7 lg:gap-8 text-xs font-medium tracking-wider uppercase text-slate-600 dark:text-slate-400">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-xs font-medium tracking-wider uppercase text-slate-600 dark:text-slate-400">
+          <button
+            type="button"
+            onClick={() => handleOpenVideoModal(0)}
+            className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer text-amber-800 dark:text-amber-200 font-semibold"
+            title="Watch 90-second Eximora introduction video"
+          >
+            <Play className="w-3 h-3 fill-current text-amber-600 dark:text-amber-300" />
+            <span>Intro Video</span>
+          </button>
           <a
             href="#trade-community"
             className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5"
@@ -361,7 +379,16 @@ export default function App() {
         </div>
 
         {/* Primary Dual CTA Bar */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xl">
+          <button
+            type="button"
+            onClick={() => handleOpenVideoModal(0)}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-white bg-white hover:bg-slate-50 dark:bg-white/10 dark:hover:bg-white/15 active:scale-[0.98] rounded-xl border border-slate-300 dark:border-white/15 transition-all shadow-md cursor-pointer"
+          >
+            <Play className="w-3.5 h-3.5 fill-current text-amber-600 dark:text-amber-300" />
+            <span>Watch Intro Video (90s)</span>
+          </button>
+
           <button
             type="button"
             onClick={() => handleOpenOrderModal('export_agro')}
@@ -374,15 +401,23 @@ export default function App() {
           <button
             type="button"
             onClick={scrollToWaitlist}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-800 dark:text-white bg-white hover:bg-slate-50 dark:bg-white/10 dark:hover:bg-white/15 active:scale-[0.98] rounded-xl border border-slate-300 dark:border-white/15 transition-all cursor-pointer shadow-xs dark:shadow-none"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
           >
-            <span>Register Interest</span>
+            <span>Register</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
+        {/* FEATURED INTRO VIDEO SHOWCASE */}
+        <div className="w-full">
+          <IntroVideoShowcase
+            onOpenVideoModal={handleOpenVideoModal}
+            onOpenOrderModal={handleOpenOrderModal}
+          />
+        </div>
+
         {/* Bilateral Trade Corridors Presentation */}
-        <div id="corridors" className="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-3xl mx-auto text-left">
+        <div id="corridors" className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-3xl mx-auto text-left">
           {/* Corridor 1: Export */}
           <div className="p-6 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all shadow-xs dark:shadow-none flex flex-col justify-between">
             <div>
@@ -618,6 +653,12 @@ export default function App() {
         orders={orders}
         onAdvanceOrder={handleAdvanceOrder}
         onOpenOrderModal={handleOpenOrderModal}
+      />
+      <IntroVideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        onOpenOrderModal={handleOpenOrderModal}
+        initialChapterIndex={videoChapterIndex}
       />
 
       {/* Floating AI Trade Concierge: Exora */}

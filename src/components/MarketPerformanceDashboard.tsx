@@ -21,6 +21,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { TradeOrder } from '../types/order';
+import { CorridorVolumeBreakdown } from './CorridorVolumeBreakdown';
 
 interface MarketPerformanceDashboardProps {
   orders: TradeOrder[];
@@ -379,6 +380,13 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
             </div>
           )}
         </div>
+
+        {/* Visual Corridor Volume Breakdown Component */}
+        <CorridorVolumeBreakdown
+          orders={orders}
+          onSelectCorridor={setSelectedCorridor}
+          activeFilter={selectedCorridor}
+        />
 
         {/* Bilateral Trade Corridors Allocation Grid */}
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/10">

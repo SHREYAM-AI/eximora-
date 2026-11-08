@@ -1139,9 +1139,7 @@ Guidelines for Exora:
       const vite = await createViteServer({
         server: {
           middlewareMode: true,
-          ws: {
-            server,
-          },
+          hmr: process.env.DISABLE_HMR !== 'true' ? { server } : false,
           watch: process.env.DISABLE_HMR === 'true' ? null : {},
         },
         appType: 'spa',
