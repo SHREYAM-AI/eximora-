@@ -426,21 +426,10 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
                   ))}
                 </div>
               ) : (
-                <div className="space-y-2 text-xs">
-                  <div className="p-2.5 rounded-lg bg-white dark:bg-black/20 border border-slate-200 dark:border-white/5 shadow-xs">
-                    <div className="flex items-center justify-between text-slate-800 dark:text-slate-200">
-                      <span className="font-medium text-slate-900 dark:text-white">Basmati & Non-Basmati Rice</span>
-                      <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">APEDA / Phyto</span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Sourced from certified farmers cooperatives in Punjab & Haryana</p>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-white dark:bg-black/20 border border-slate-200 dark:border-white/5 shadow-xs">
-                    <div className="flex items-center justify-between text-slate-800 dark:text-slate-200">
-                      <span className="font-medium text-slate-900 dark:text-white">Organic Spices & Oilseeds</span>
-                      <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">FSSAI / Lab Tested</span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Direct sourcing from accredited processors in Gujarat & Rajasthan</p>
-                  </div>
+                <div className="py-6 px-3 text-center border border-dashed border-slate-200 dark:border-white/10 rounded-lg bg-slate-50/50 dark:bg-white/[0.01]">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    No active export contracts queued. Sourced agro dockets will list here upon registration.
+                  </p>
                 </div>
               )}
             </div>
@@ -470,21 +459,10 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
                   ))}
                 </div>
               ) : (
-                <div className="space-y-2 text-xs">
-                  <div className="p-2.5 rounded-lg bg-white dark:bg-black/20 border border-slate-200 dark:border-white/5 shadow-xs">
-                    <div className="flex items-center justify-between text-slate-800 dark:text-slate-200">
-                      <span className="font-medium text-slate-900 dark:text-white">GaN Fast Charging Adapters</span>
-                      <span className="text-[10px] font-mono text-amber-700 dark:text-amber-300 font-semibold">BIS CRS / CE</span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Procured from verified electronics clusters for Indian wholesalers</p>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-white dark:bg-black/20 border border-slate-200 dark:border-white/5 shadow-xs">
-                    <div className="flex items-center justify-between text-slate-800 dark:text-slate-200">
-                      <span className="font-medium text-slate-900 dark:text-white">Braided High-Durability Cables</span>
-                      <span className="text-[10px] font-mono text-amber-700 dark:text-amber-300 font-semibold">RoHS / Tested</span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Imported for e-commerce brands, retail networks, and regional distributors</p>
-                  </div>
+                <div className="py-6 px-3 text-center border border-dashed border-slate-200 dark:border-white/10 rounded-lg bg-slate-50/50 dark:bg-white/[0.01]">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    No active import contracts queued. Procured electronics dockets will list here upon registration.
+                  </p>
                 </div>
               )}
             </div>

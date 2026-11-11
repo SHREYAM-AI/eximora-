@@ -69,7 +69,6 @@ export function AdminCentreModal({
     roleLabel: string;
     time: string;
   } | null>(null);
-  const [isSimulatingVendorOrder, setIsSimulatingVendorOrder] = useState(false);
 
   // Filters for Orders Tab
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,78 +212,6 @@ export function AdminCentreModal({
     }
   };
 
-  // Instant Vendor Order Simulation for easy administrative verification
-  const handleSimulateVendorOrder = async () => {
-    setIsSimulatingVendorOrder(true);
-    try {
-      const vendorSamples = [
-        {
-          corridor: 'export_agro' as const,
-          productName: '1121 Steam Extra Long Basmati Rice (APEDA Sortex)',
-          quantity: '40',
-          unit: 'Metric Tons',
-          origin: 'Amritsar Cooperative Milling Cluster, Punjab',
-          destination: 'Port of Jebel Ali, Dubai',
-          incoterm: 'CIF' as const,
-          clientName: 'Sardar Harpreet Singh',
-          clientCompany: 'Amritsar Agro Producer Federation (Vendor)',
-          clientEmail: 'harpreet@amritsarmilling.coop',
-          partyRole: 'vendor' as const,
-          partyRoleLabel: 'Farmer Cooperative Vendor',
-          specialInstructions: 'Pre-shipment moisture certificate <= 11.2% and fumigation seal.',
-        },
-        {
-          corridor: 'import_electronics' as const,
-          productName: '65W GaN Dual USB-C Fast Wall Chargers (IS 13252)',
-          quantity: '6,000',
-          unit: 'Units',
-          origin: 'Shenzhen Technology Manufacturing Cluster',
-          destination: 'Nhava Sheva Sea Port / Delhi ICD',
-          incoterm: 'DDP' as const,
-          clientName: 'David Lin',
-          clientCompany: 'Shenzhen MicroPower Technology (Vendor)',
-          clientEmail: 'david.lin@micropower.cn',
-          partyRole: 'vendor' as const,
-          partyRoleLabel: 'Certified Electronics Factory (Vendor)',
-          specialInstructions: 'Valid BIS CRS registration number labeled on individual gift boxes.',
-        },
-      ];
-
-      const sample = vendorSamples[Math.floor(Math.random() * vendorSamples.length)];
-      const res = await fetch('/api/orders/parse-and-register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sample),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.order) {
-          setAdminData((prev) => ({
-            ...prev,
-            orders: [data.order, ...prev.orders.filter((o) => o.id !== data.order.id)],
-          }));
-          setFlashingOrderIds((prev) => new Set(prev).add(data.order.id));
-          setLiveVendorAlert({
-            orderNumber: data.order.orderNumber,
-            productName: data.order.productName,
-            quantity: `${data.order.quantity} ${data.order.unit}`,
-            company: data.order.clientCompany,
-            roleLabel: data.order.partyRoleLabel || 'Vendor',
-            time: 'Received Just Now',
-          });
-          if (soundAlertsEnabled) {
-            playVendorOrderChime();
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('Vendor simulation error:', err);
-    } finally {
-      setIsSimulatingVendorOrder(false);
-    }
-  };
-
   // Filtered orders list
   const filteredOrders = useMemo(() => {
     const list = adminData.orders || [];
@@ -401,16 +328,18 @@ export function AdminCentreModal({
               <span className="hidden sm:inline">{soundAlertsEnabled ? 'Sound: ON' : 'Muted'}</span>
             </button>
 
-            {/* Simulate Vendor Order Button */}
+            {/* Place Order with AI Button */}
             <button
               type="button"
-              onClick={handleSimulateVendorOrder}
-              disabled={isSimulatingVendorOrder}
-              title="Dispatch a test vendor order to verify instant real-time appearance"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 text-black font-semibold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              onClick={() => {
+                onClose();
+                onOpenOrderModal('export_agro');
+              }}
+              title="Open the AI Order Placement Desk to register an authentic trade order"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 text-black font-semibold transition-all shadow-xs cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{isSimulatingVendorOrder ? 'Transmitting...' : 'Simulate Vendor Order'}</span>
+              <span>Place Order with AI</span>
             </button>
 
             <button
@@ -716,7 +645,7 @@ export function AdminCentreModal({
                   <h4 className="text-sm font-medium text-slate-900 dark:text-white">No Matching Orders Found</h4>
                   <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto mt-1">
                     {adminData.orders.length === 0
-                      ? 'The order pipeline is clean. Test order placement with the AI Order Desk or click Simulate Vendor Order.'
+                      ? 'The order pipeline is clean. Orders placed via the AI Order Desk will appear here in real time.'
                       : 'No orders match your current search and stage filters.'}
                   </p>
                   <button

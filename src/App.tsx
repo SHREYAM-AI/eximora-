@@ -17,8 +17,9 @@ import { TradeCommunityHub } from './components/TradeCommunityHub';
 import { AdminCentreModal } from './components/AdminCentreModal';
 import { IntroVideoModal } from './components/IntroVideoModal';
 import { IntroVideoShowcase } from './components/IntroVideoShowcase';
+import { GlobalTradeNetwork } from './components/GlobalTradeNetwork';
 import { TradeOrder, TradeCorridor } from './types/order';
-import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield, Users, X, Bell, Radio, Play, Film } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield, Users, X, Bell, Radio, Play, Film, Globe } from 'lucide-react';
 import { playVendorOrderChime } from './utils/audioAlert';
 import { ThemeToggle } from './components/ThemeToggle';
 
@@ -272,6 +273,13 @@ export default function App() {
             <span>Intro Video</span>
           </button>
           <a
+            href="#global-network"
+            className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5"
+          >
+            <Globe className="w-3 h-3 text-amber-600 dark:text-amber-300" />
+            <span>Global Network</span>
+          </a>
+          <a
             href="#trade-community"
             className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5"
           >
@@ -492,6 +500,11 @@ export default function App() {
             <CheckCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300" />
             <span>Sell</span>
           </span>
+        </div>
+
+        {/* D3 GLOBAL TRADE NETWORK & MARITIME CORRIDOR ROUTER */}
+        <div className="w-full">
+          <GlobalTradeNetwork onOpenOrderModal={handleOpenOrderModal} />
         </div>
 
         {/* MARKET PERFORMANCE & REAL TRADE VOLUME TRENDS DASHBOARD */}

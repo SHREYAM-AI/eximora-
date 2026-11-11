@@ -44,10 +44,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
   const [selectedPostType, setSelectedPostType] = useState<'all' | PostType>('all');
 
   // Expanded replies state
-  const [expandedPostIds, setExpandedPostIds] = useState<Record<string, boolean>>({
-    'post-exm-001': true,
-    'post-exm-002': true,
-  });
+  const [expandedPostIds, setExpandedPostIds] = useState<Record<string, boolean>>({});
 
   // Reply input state per post
   const [replyInputs, setReplyInputs] = useState<Record<string, { authorName: string; authorCompany: string; authorRole: UserRole; content: string }>>({});
@@ -765,55 +762,73 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
               <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 font-medium">Peer-Reviewed Quality Standards</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {insights.map((insight) => (
-                <div
-                  key={insight.id}
-                  className="p-5 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-amber-500/50 dark:hover:border-amber-400/40 transition-all flex flex-col justify-between text-left shadow-xs"
+            {insights.length === 0 ? (
+              <div className="py-14 px-6 text-center border border-dashed border-slate-300 dark:border-white/10 rounded-xl bg-white dark:bg-white/[0.01]">
+                <BookOpen className="w-8 h-8 mx-auto text-slate-400 dark:text-slate-500 mb-2" />
+                <h4 className="text-sm font-medium text-slate-900 dark:text-white">No Regulatory Briefings Yet</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
+                  Generate verified regulatory analysis on APEDA testing, BIS CRS, or container freight on demand using our AI Trade Advisor.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('ai_advisor')}
+                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-300 to-amber-400 text-black hover:from-amber-200 hover:to-amber-300 transition-all cursor-pointer shadow-xs"
                 >
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-white/5">
-                      <span className="text-amber-800 dark:text-amber-300 font-semibold uppercase">
-                        {insight.corridor === 'export_agro' ? 'Food Export Intelligence' : 'Electronics Import Intelligence'}
-                      </span>
-                      <span>{insight.readTime}</span>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Open AI Trade Advisor</span>
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {insights.map((insight) => (
+                  <div
+                    key={insight.id}
+                    className="p-5 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-amber-500/50 dark:hover:border-amber-400/40 transition-all flex flex-col justify-between text-left shadow-xs"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-white/5">
+                        <span className="text-amber-800 dark:text-amber-300 font-semibold uppercase">
+                          {insight.corridor === 'export_agro' ? 'Food Export Intelligence' : 'Electronics Import Intelligence'}
+                        </span>
+                        <span>{insight.readTime}</span>
+                      </div>
+
+                      <h4 className="text-base font-serif font-semibold text-slate-900 dark:text-white mt-3">
+                        {insight.title}
+                      </h4>
+
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 line-clamp-3 font-light leading-relaxed">
+                        {insight.summary}
+                      </p>
+
+                      <div className="mt-4 space-y-1.5 pt-3 border-t border-slate-200 dark:border-white/5">
+                        <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block font-semibold">
+                          Key Operational Takeaways:
+                        </span>
+                        {insight.keyTakeaways.slice(0, 3).map((takeaway, idx) => (
+                          <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                            <span className="text-[11px] leading-snug">{takeaway}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
-                    <h4 className="text-base font-serif font-semibold text-slate-900 dark:text-white mt-3">
-                      {insight.title}
-                    </h4>
-
-                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 line-clamp-3 font-light leading-relaxed">
-                      {insight.summary}
-                    </p>
-
-                    <div className="mt-4 space-y-1.5 pt-3 border-t border-slate-200 dark:border-white/5">
-                      <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block font-semibold">
-                        Key Operational Takeaways:
-                      </span>
-                      {insight.keyTakeaways.slice(0, 3).map((takeaway, idx) => (
-                        <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                          <span className="text-[11px] leading-snug">{takeaway}</span>
-                        </div>
-                      ))}
+                    <div className="mt-5 pt-3 border-t border-slate-200 dark:border-white/5 flex items-center justify-between text-xs font-mono">
+                      <span className="text-slate-500 dark:text-slate-400 text-[11px] truncate max-w-[200px]">{insight.author}</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedInsight(insight)}
+                        className="text-amber-800 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-200 font-medium transition-colors inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>Read Brief</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
                     </div>
                   </div>
-
-                  <div className="mt-5 pt-3 border-t border-slate-200 dark:border-white/5 flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-500 dark:text-slate-400 text-[11px] truncate max-w-[200px]">{insight.author}</span>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedInsight(insight)}
-                      className="text-amber-800 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-200 font-medium transition-colors inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Read Brief</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -71,7 +71,6 @@ export function CorridorVolumeBreakdown({
 
     const totalOrdersCount = orders.length;
 
-    // Macro bilateral share (Order count-based for direct dimensional parity)
     const bilateralShareData = [
       {
         name: 'Food & Agro Exports',
@@ -79,7 +78,7 @@ export function CorridorVolumeBreakdown({
         orderCount: exportOrders.length,
         volume: exportVolumeTotal,
         unit: 'MT',
-        sharePercent: totalOrdersCount > 0 ? Math.round((exportOrders.length / totalOrdersCount) * 100) : 50,
+        sharePercent: totalOrdersCount > 0 ? Math.round((exportOrders.length / totalOrdersCount) * 100) : 0,
         fill: '#059669',
       },
       {
@@ -88,7 +87,7 @@ export function CorridorVolumeBreakdown({
         orderCount: importOrders.length,
         volume: importVolumeTotal,
         unit: 'Units',
-        sharePercent: totalOrdersCount > 0 ? Math.round((importOrders.length / totalOrdersCount) * 100) : 50,
+        sharePercent: totalOrdersCount > 0 ? Math.round((importOrders.length / totalOrdersCount) * 100) : 0,
         fill: '#d97706',
       },
     ];
@@ -146,49 +145,8 @@ export function CorridorVolumeBreakdown({
       };
     });
 
-    // If no orders yet, provide illustrative portfolio clusters for architecture readiness
-    const displayCommodities = commodityList.length > 0 ? commodityList : [
-      {
-        name: 'Basmati Rice (APEDA Certified)',
-        category: 'Food & Agro Export',
-        corridor: 'export_agro' as const,
-        ordersCount: 0,
-        totalVolume: 0,
-        unit: 'MT',
-        percentage: 60,
-        fill: '#059669',
-      },
-      {
-        name: 'Organic Spices (FSSAI Lab Tested)',
-        category: 'Food & Agro Export',
-        corridor: 'export_agro' as const,
-        ordersCount: 0,
-        totalVolume: 0,
-        unit: 'MT',
-        percentage: 40,
-        fill: '#10b981',
-      },
-      {
-        name: 'GaN Dual Chargers (BIS CRS IS 13252)',
-        category: 'Electronics Import',
-        corridor: 'import_electronics' as const,
-        ordersCount: 0,
-        totalVolume: 0,
-        unit: 'Units',
-        percentage: 65,
-        fill: '#d97706',
-      },
-      {
-        name: '100W PD Cables (RoHS 2.0)',
-        category: 'Electronics Import',
-        corridor: 'import_electronics' as const,
-        ordersCount: 0,
-        totalVolume: 0,
-        unit: 'Units',
-        percentage: 35,
-        fill: '#f59e0b',
-      },
-    ];
+    // Display only real commodities from active orders (zero dummy data)
+    const displayCommodities = commodityList;
 
     return {
       exportOrdersCount: exportOrders.length,
@@ -294,7 +252,15 @@ export function CorridorVolumeBreakdown({
             </span>
           </div>
 
-          {activeTab === 'donut' ? (
+          {stats.totalOrdersCount === 0 ? (
+            <div className="py-12 px-4 text-center border border-dashed border-slate-300 dark:border-white/10 rounded-xl bg-white dark:bg-black/20 my-2">
+              <Package className="w-8 h-8 mx-auto text-slate-400 dark:text-slate-500 mb-2" />
+              <h4 className="text-xs font-serif font-semibold text-slate-900 dark:text-white">Awaiting Order Inquiries</h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1 leading-relaxed">
+                Corridor allocation ratios and commodity charts calculate strictly from live trade dockets. No dummy figures or simulated volumes are displayed.
+              </p>
+            </div>
+          ) : activeTab === 'donut' ? (
             <div className="relative w-full h-[230px] flex items-center justify-center my-2">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -332,7 +298,7 @@ export function CorridorVolumeBreakdown({
                 <span className="text-xl font-serif font-bold text-slate-900 dark:text-white tabular-nums">
                   {stats.totalOrdersCount > 0
                     ? `${stats.bilateralShareData[0].sharePercent}% : ${stats.bilateralShareData[1].sharePercent}%`
-                    : '1:1'}
+                    : '0% : 0%'}
                 </span>
                 <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">
                   Agro : Elec

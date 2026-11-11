@@ -48,3 +48,16 @@
 .dark .hairline-border-hover:hover {
   border-color: rgba(255, 255, 255, 0.18);
 }
+
+@keyframes routeFlow {
+  from {
+    stroke-dashoffset: 138;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-route-flow {
+  animation: routeFlow 3.2s linear infinite;
+}
