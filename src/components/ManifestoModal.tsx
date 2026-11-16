@@ -40,7 +40,7 @@ export function ManifestoModal({ isOpen, onClose }: ManifestoModalProps) {
           <div>
             <span className="text-[11px] font-mono tracking-widest uppercase text-amber-800 dark:text-amber-300/80 font-medium">Ethos & Vision</span>
             <h2 id="manifesto-title" className="text-xl sm:text-2xl font-serif text-slate-900 dark:text-white tracking-wide mt-1">
-              The Eximora Manifesto
+              The Tiffora Manifesto
             </h2>
           </div>
           <button
@@ -55,21 +55,21 @@ export function ManifestoModal({ isOpen, onClose }: ManifestoModalProps) {
 
         <div className="mt-8 space-y-6 text-sm sm:text-base leading-relaxed text-slate-700 dark:text-slate-300 font-light">
           <p>
-            Eximora is founded on the conviction that modern international commerce demands agile precision rather than cumbersome industrial inertia.
+            Tiffora is founded on the conviction that modern interstate commerce across India demands agile precision rather than fragmented mandi brokerages or industrial inertia.
           </p>
           <p>
-            As a two-way trading company, our purpose is twofold: opening global markets for high-grade food products cultivated by Indian farmers and certified processors, while securing dependable, high-demand electronic accessories for India&apos;s wholesalers, retailers, and online merchants.
+            As a two-way interstate trading company, our purpose is twofold: opening Pan-India commercial markets for high-grade food products cultivated by farmers and certified processors in surplus agrarian states, while securing dependable, high-demand electronic accessories from metro tech hubs for state wholesalers, retailers, and online merchants.
           </p>
           <div className="p-6 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 my-6">
             <blockquote className="font-serif italic text-base sm:text-lg text-amber-900 dark:text-amber-100/90 leading-snug">
-              &ldquo;We are an asset-light trader: we do not manufacture. We source, certify, ship, and sell with relentless standards of trust.&rdquo;
+              &ldquo;We are an asset-light interstate trader: we do not manufacture. We source, certify, ship, and sell across Indian state borders with relentless standards of trust.&rdquo;
             </blockquote>
           </div>
           <p>
-            By disintermediating fragmented broker networks and focusing our capital on rigorous quality certification, compliant cross-border logistics, and bilateral demand matching, Eximora bridges critical trade corridors between India and the world.
+            By disintermediating multi-tier state broker networks and focusing our capital on FSSAI/AGMARK &amp; BIS CRS quality certification, NIC E-Way Bill and IGST compliance, and express highway and rail logistics, Tiffora bridges critical two-way supply corridors across every major Indian state.
           </p>
           <p className="text-xs text-slate-500 pt-4 border-t border-slate-200 dark:border-white/5 font-mono">
-            Operational Document · Bilateral Trade Desks · Mumbai · Dubai · Singapore · Rotterdam
+            Operational Document · Interstate Trade Desks · Delhi NCR · Ludhiana · Ahmedabad · Mumbai · Bengaluru · Chennai
           </p>
         </div>
 

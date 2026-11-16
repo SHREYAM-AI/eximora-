@@ -50,6 +50,9 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
   const [replyInputs, setReplyInputs] = useState<Record<string, { authorName: string; authorCompany: string; authorRole: UserRole; content: string }>>({});
   const [submittingReplyPostId, setSubmittingReplyPostId] = useState<string | null>(null);
 
+  const [replyErrors, setReplyErrors] = useState<Record<string, string>>({});
+  const [newPostError, setNewPostError] = useState('');
+
   // New Post Modal
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [newPostForm, setNewPostForm] = useState<{
@@ -65,7 +68,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
     tags: string;
     suggestedQty: string;
     suggestedUnit: string;
-    incoterm: 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
+    incoterm: 'FOR' | 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
     destination: string;
   }>({
     title: '',
@@ -73,14 +76,14 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
     postType: 'buy_inquiry',
     authorName: '',
     authorCompany: '',
-    authorRole: 'Overseas Buyer',
+    authorRole: 'Interstate Buyer',
     authorLocation: '',
     commodityOrTopic: '',
     content: '',
     tags: '',
     suggestedQty: '',
     suggestedUnit: 'Metric Tons',
-    incoterm: 'CIF',
+    incoterm: 'FOR',
     destination: '',
   });
 
@@ -152,12 +155,13 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
   };
 
   const handleReplyChange = (postId: string, field: string, value: string) => {
+    setReplyErrors((prev) => ({ ...prev, [postId]: '' }));
     setReplyInputs((prev) => ({
       ...prev,
       [postId]: {
         authorName: prev[postId]?.authorName || '',
         authorCompany: prev[postId]?.authorCompany || '',
-        authorRole: (prev[postId]?.authorRole as UserRole) || 'Indian Wholesaler',
+        authorRole: (prev[postId]?.authorRole as UserRole) || 'State Wholesaler',
         content: prev[postId]?.content || '',
         [field]: value,
       },
@@ -167,7 +171,10 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
   const handleSubmitReply = async (postId: string) => {
     const input = replyInputs[postId];
     if (!input || !input.content.trim() || !input.authorName.trim()) {
-      alert('Please enter your name and message content before submitting.');
+      setReplyErrors((prev) => ({
+        ...prev,
+        [postId]: 'Please enter your name and message content before submitting.',
+      }));
       return;
     }
 
@@ -214,22 +221,23 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
 
   const handleCreateNewPost = async (e: React.FormEvent) => {
     e.preventDefault();
+    setNewPostError('');
     if (!newPostForm.title.trim() || !newPostForm.content.trim() || !newPostForm.authorName.trim()) {
-      alert('Please fill out the title, content, and your author name.');
+      setNewPostError('Please fill out the title, content, and your author name.');
       return;
     }
 
     try {
       const parsedTags = newPostForm.tags
         ? newPostForm.tags.split(',').map((t) => t.trim()).filter(Boolean)
-        : [newPostForm.commodityOrTopic || 'Trade Inquiry'];
+        : [newPostForm.commodityOrTopic || 'Interstate Inquiry'];
 
       const payload = {
         title: newPostForm.title,
         channel: newPostForm.channel,
         postType: newPostForm.postType,
         authorName: newPostForm.authorName,
-        authorCompany: newPostForm.authorCompany || 'Commercial Trade Entity',
+        authorCompany: newPostForm.authorCompany || 'Interstate Trade Entity',
         authorRole: newPostForm.authorRole,
         authorLocation: newPostForm.authorLocation || 'India',
         commodityOrTopic: newPostForm.commodityOrTopic || newPostForm.title,
@@ -242,8 +250,8 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                 suggestedProduct: newPostForm.commodityOrTopic || newPostForm.title,
                 quantity: newPostForm.suggestedQty,
                 unit: newPostForm.suggestedUnit,
-                origin: newPostForm.channel === 'export_agro' ? 'India' : 'Global Hub',
-                destination: newPostForm.destination || 'Destination Port',
+                origin: newPostForm.channel === 'export_agro' ? 'Ludhiana, Punjab' : 'Delhi NCR Hub',
+                destination: newPostForm.destination || 'Mumbai / Bengaluru Hub',
                 incoterm: newPostForm.incoterm,
               }
             : undefined,
@@ -267,20 +275,21 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
             postType: 'buy_inquiry',
             authorName: '',
             authorCompany: '',
-            authorRole: 'Overseas Buyer',
+            authorRole: 'Interstate Buyer',
             authorLocation: '',
             commodityOrTopic: '',
             content: '',
             tags: '',
             suggestedQty: '',
             suggestedUnit: 'Metric Tons',
-            incoterm: 'CIF',
+            incoterm: 'FOR',
             destination: '',
           });
         }
       }
     } catch (err) {
       console.error('Failed to create post:', err);
+      setNewPostError('Unable to publish inquiry right now. Please try again.');
     }
   };
 
@@ -315,7 +324,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
 
   const handleFormalizeOrderFromPost = (post: CommunityPost) => {
     const corridor: TradeCorridor = post.channel === 'import_electronics' ? 'import_electronics' : 'export_agro';
-    const preset = `${post.title}: We want to execute this trade inquiry under Eximora's asset-light sourcing and quality certification standard. Specifications: ${post.content}`;
+    const preset = `${post.title}: We want to execute this trade inquiry under Tiffora's asset-light sourcing and quality certification standard. Specifications: ${post.content}`;
     onOpenOrderModal(corridor, preset);
   };
 
@@ -343,13 +352,13 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
         <div>
           <div className="flex items-center gap-2 text-xs font-mono tracking-widest uppercase text-amber-800 dark:text-amber-300/80 mb-2 font-semibold">
             <Users className="w-3.5 h-3.5 text-amber-700 dark:text-amber-300" />
-            <span>Two-Way Import-Export Community</span>
+            <span>Two-Way Interstate Trade Community</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-serif text-slate-900 dark:text-white tracking-tight">
-            Bilateral Trade Exchange & Industry Insights
+            Interstate Trade Exchange & Industry Insights
           </h2>
           <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl font-light">
-            An open forum connecting overseas buyers, Indian agricultural farmer cooperatives, electronics manufacturing partners, and wholesale distributors. Exchange commercial inquiries, discuss harvest allocations, and gain compliance insights.
+            An open forum connecting state buyers, FPO farmer cooperatives, metro electronics supply hubs, and wholesale distributors. Exchange commercial inquiries, coordinate mandi allocations, and review GST/E-Way compliance.
           </p>
         </div>
 
@@ -420,7 +429,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search inquiries, commodities, ports, certifications..."
+                  placeholder="Search inquiries, commodities, state hubs, E-Way or BIS certs..."
                   className="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 font-mono"
                 />
               </div>
@@ -445,7 +454,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                     }`}
                   >
                     <Wheat className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                    <span>Food Exports</span>
+                    <span>State Agro Dispatch</span>
                   </button>
                   <button
                     type="button"
@@ -455,7 +464,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                     }`}
                   >
                     <Cpu className="w-3 h-3 text-amber-600 dark:text-amber-300" />
-                    <span>Electronics Imports</span>
+                    <span>Electronics Supply</span>
                   </button>
                   <button
                     type="button"
@@ -524,7 +533,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                   const currentReplyInput = replyInputs[post.id] || {
                     authorName: '',
                     authorCompany: '',
-                    authorRole: 'Indian Wholesaler' as UserRole,
+                    authorRole: 'State Wholesaler' as UserRole,
                     content: '',
                   };
 
@@ -712,18 +721,18 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                                 onChange={(e) => handleReplyChange(post.id, 'authorRole', e.target.value)}
                                 className="px-3 py-1.5 rounded bg-white dark:bg-[#111218] border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-amber-500"
                               >
-                                <option value="Indian Farmer Cooperative">Indian Farmer Co-op</option>
-                                <option value="Indian Processor">Indian Processor</option>
-                                <option value="Overseas Buyer">Overseas Buyer</option>
-                                <option value="Indian Wholesaler">Indian Wholesaler</option>
-                                <option value="Retail & Online Seller">Retail / E-commerce Seller</option>
-                                <option value="Trade Compliance Specialist">Compliance Specialist</option>
+                                <option value="State Farmer Cooperative (FPO)">State Farmer Co-op (FPO)</option>
+                                <option value="Regional Agro Processor">Regional Agro Processor</option>
+                                <option value="Interstate Buyer">Interstate Buyer</option>
+                                <option value="State Wholesaler">State Wholesaler</option>
+                                <option value="Retail & Online Seller">Retail & Online Seller</option>
+                                <option value="GST & E-Way Specialist">GST & E-Way Specialist</option>
                               </select>
                             </div>
                             <div className="flex gap-2">
                               <textarea
                                 rows={2}
-                                placeholder="Offer allocation, state delivery timeline, or ask technical specifications..."
+                                placeholder="Offer stock allocation, state delivery timeline, or ask technical specifications..."
                                 value={currentReplyInput.content}
                                 onChange={(e) => handleReplyChange(post.id, 'content', e.target.value)}
                                 className="flex-1 px-3 py-2 rounded bg-white dark:bg-white/[0.04] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs focus:outline-none focus:border-amber-500 resize-none font-light"
@@ -737,6 +746,9 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                                 {submittingReplyPostId === post.id ? 'Sending...' : 'Send'}
                               </button>
                             </div>
+                            {replyErrors[post.id] && (
+                              <p className="text-[11px] text-rose-600 dark:text-rose-400">{replyErrors[post.id]}</p>
+                            )}
                           </div>
                         </div>
                       )}
@@ -753,13 +765,13 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
             <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/5">
               <div>
                 <h3 className="text-base font-serif font-semibold text-slate-900 dark:text-white">
-                  Bilateral Trade Briefings & Regulatory Intelligence
+                  Interstate Trade Briefings & Regulatory Intelligence
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                  Authoritative operational guides on APEDA phytosanitary testing, BIS Compulsory Registration Schemes, and customs logistics.
+                  Authoritative operational guides on FSSAI Interstate licensing, AGMARK grading, NIC E-Way Bills, BIS CRS, and highway/rail freight.
                 </p>
               </div>
-              <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 font-medium">Peer-Reviewed Quality Standards</span>
+              <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 font-medium">Verified Statutory Standards</span>
             </div>
 
             {insights.length === 0 ? (
@@ -767,7 +779,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                 <BookOpen className="w-8 h-8 mx-auto text-slate-400 dark:text-slate-500 mb-2" />
                 <h4 className="text-sm font-medium text-slate-900 dark:text-white">No Regulatory Briefings Yet</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
-                  Generate verified regulatory analysis on APEDA testing, BIS CRS, or container freight on demand using our AI Trade Advisor.
+                  Generate verified regulatory analysis on FSSAI Interstate rules, E-Way Bill compliance, or BIS CRS on demand using our AI Trade Advisor.
                 </p>
                 <button
                   type="button"
@@ -788,7 +800,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                     <div>
                       <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-white/5">
                         <span className="text-amber-800 dark:text-amber-300 font-semibold uppercase">
-                          {insight.corridor === 'export_agro' ? 'Food Export Intelligence' : 'Electronics Import Intelligence'}
+                          {insight.corridor === 'export_agro' ? 'State Agro Dispatch Intelligence' : 'Electronics Supply Intelligence'}
                         </span>
                         <span>{insight.readTime}</span>
                       </div>
@@ -841,10 +853,10 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                 <span>Instant Regulatory & Supply Chain Advisory</span>
               </div>
               <h3 className="text-lg font-serif font-semibold text-slate-900 dark:text-white">
-                Ask Eximora Trade Intelligence
+                Ask Tiffora Trade Intelligence
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-2xl font-light leading-relaxed">
-                Enter any trade query regarding agricultural phytosanitary norms, APEDA requirements, BIS CRS certification timelines for electronics, tariff codes, or ocean freight parameters.
+                Enter any interstate trade query regarding FSSAI & AGMARK grading, IGST tax invoicing, NIC E-Way Bill rules, BIS CRS certification, LMPC packaging, or highway/rail logistics.
               </p>
 
               {/* Input Form */}
@@ -853,7 +865,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                   type="text"
                   value={advisorTopic}
                   onChange={(e) => setAdvisorTopic(e.target.value)}
-                  placeholder="e.g. Mandatory lab testing for exporting organic turmeric to Germany under FOB..."
+                  placeholder="e.g. NIC E-Way Bill and FSSAI compliance for moving 24 MT Basmati from Punjab to Maharashtra..."
                   className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-black/60 border border-slate-300 dark:border-white/15 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 font-mono shadow-xs"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleGenerateAdvisorBrief();
@@ -876,34 +888,34 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                 <button
                   type="button"
                   onClick={() => {
-                    setAdvisorTopic('EU pesticide residue limits & APEDA TraceNet for Basmati rice export');
-                    handleGenerateAdvisorBrief('EU pesticide residue limits & APEDA TraceNet for Basmati rice export');
+                    setAdvisorTopic('Punjab Basmati FSSAI Interstate & NIC E-Way Bill limits for Maharashtra delivery');
+                    handleGenerateAdvisorBrief('Punjab Basmati FSSAI Interstate & NIC E-Way Bill limits for Maharashtra delivery');
                   }}
                   className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors underline underline-offset-4 cursor-pointer"
                 >
-                  Basmati to EU Residue Limits
+                  Punjab Basmati FSSAI & E-Way Limits
                 </button>
                 <span>·</span>
                 <button
                   type="button"
                   onClick={() => {
-                    setAdvisorTopic('BIS CRS IS 13252 test requirements for GaN 65W chargers into Nhava Sheva');
-                    handleGenerateAdvisorBrief('BIS CRS IS 13252 test requirements for GaN 65W chargers into Nhava Sheva');
+                    setAdvisorTopic('BIS CRS IS 13252 & Legal Metrology LMPC MRP rules for GaN 65W chargers dispatched interstate');
+                    handleGenerateAdvisorBrief('BIS CRS IS 13252 & Legal Metrology LMPC MRP rules for GaN 65W chargers dispatched interstate');
                   }}
                   className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors underline underline-offset-4 cursor-pointer"
                 >
-                  GaN Chargers BIS CRS Testing
+                  GaN Chargers BIS CRS & LMPC
                 </button>
                 <span>·</span>
                 <button
                   type="button"
                   onClick={() => {
-                    setAdvisorTopic('Deep sea container moisture desiccant protocols for whole spice shipping');
-                    handleGenerateAdvisorBrief('Deep sea container moisture desiccant protocols for whole spice shipping');
+                    setAdvisorTopic('Long-haul monsoon container truck moisture desiccant protocols for Gujarat spices to Bengaluru');
+                    handleGenerateAdvisorBrief('Long-haul monsoon container truck moisture desiccant protocols for Gujarat spices to Bengaluru');
                   }}
                   className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors underline underline-offset-4 cursor-pointer"
                 >
-                  Spice Container Moisture Protocols
+                  Monsoon Truck Desiccant Protocols
                 </button>
               </div>
             </div>
@@ -950,7 +962,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
 
                 <div className="p-3.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-xs">
                   <span className="font-mono text-[10px] uppercase text-amber-800 dark:text-amber-300 font-bold block">
-                    Eximora Asset-Light Execution Protocol:
+                    Tiffora Asset-Light Execution Protocol:
                   </span>
                   <p className="text-slate-800 dark:text-slate-200 mt-1 font-light leading-relaxed">
                     {advisorBrief.operationalImpact}
@@ -992,7 +1004,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
               <span>Publish Trade Inquiry or Offer</span>
             </div>
             <h3 className="text-lg font-serif font-semibold text-slate-900 dark:text-white">
-              Connect with Eximora's Two-Way Trade Network
+              Connect with Tiffora's Two-Way Interstate Trade Network
             </h3>
 
             <form onSubmit={handleCreateNewPost} className="mt-5 space-y-4 text-xs font-sans">
@@ -1004,9 +1016,9 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                     onChange={(e) => setNewPostForm({ ...newPostForm, channel: e.target.value as any })}
                     className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#111218] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
                   >
-                    <option value="export_agro">Food Products Export (Indian Farmers → Overseas)</option>
-                    <option value="import_electronics">Electronic Accessories Import (Global → Indian Retail)</option>
-                    <option value="regulations_logistics">Logistics, Freight & Compliance</option>
+                    <option value="export_agro">State Agro Dispatch (Producer States → Pan-India)</option>
+                    <option value="import_electronics">Electronic Accessories Supply (Metro Hubs → State Retail)</option>
+                    <option value="regulations_logistics">Highway/Rail Logistics, E-Way & IGST Compliance</option>
                   </select>
                 </div>
 
@@ -1017,10 +1029,10 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                     onChange={(e) => setNewPostForm({ ...newPostForm, postType: e.target.value as any })}
                     className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#111218] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
                   >
-                    <option value="buy_inquiry">Buy Inquiry (Looking to Source / Import)</option>
-                    <option value="supply_offer">Supply Offer (Producer Allocation / Wholesale)</option>
-                    <option value="market_insight">Market Advisory / Industry Insight</option>
-                    <option value="regulatory_qa">Regulatory & Compliance Q&A</option>
+                    <option value="buy_inquiry">Buy Inquiry (Looking to Procure / Receive)</option>
+                    <option value="supply_offer">Supply Offer (FPO Allocation / Metro Stock)</option>
+                    <option value="market_insight">Market Advisory / Mandi Trend</option>
+                    <option value="regulatory_qa">GST, E-Way & Compliance Q&A</option>
                   </select>
                 </div>
               </div>
@@ -1030,7 +1042,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Looking for 30 MT Organic Cumin Seeds CIF Rotterdam or 5,000 GaN Chargers"
+                  placeholder="e.g. Looking for 30 MT Organic Unjha Cumin FOR Ahmedabad or 5,000 GaN Chargers to Jaipur"
                   value={newPostForm.title}
                   onChange={(e) => setNewPostForm({ ...newPostForm, title: e.target.value })}
                   className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/[0.04] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
@@ -1050,10 +1062,10 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Company / Organization</label>
+                  <label className="text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Company / FPO</label>
                   <input
                     type="text"
-                    placeholder="e.g. Apex Global Trading"
+                    placeholder="e.g. Deccan Agro Traders Pvt Ltd"
                     value={newPostForm.authorCompany}
                     onChange={(e) => setNewPostForm({ ...newPostForm, authorCompany: e.target.value })}
                     className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/[0.04] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
@@ -1066,12 +1078,12 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                     onChange={(e) => setNewPostForm({ ...newPostForm, authorRole: e.target.value as any })}
                     className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#111218] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
                   >
-                    <option value="Overseas Buyer">Overseas Buyer</option>
-                    <option value="Indian Farmer Cooperative">Indian Farmer Cooperative</option>
-                    <option value="Indian Processor">Indian Processor</option>
-                    <option value="Indian Wholesaler">Indian Wholesaler</option>
+                    <option value="Interstate Buyer">Interstate Buyer</option>
+                    <option value="State Farmer Cooperative (FPO)">State Farmer Cooperative (FPO)</option>
+                    <option value="Regional Agro Processor">Regional Agro Processor</option>
+                    <option value="State Wholesaler">State Wholesaler</option>
                     <option value="Retail & Online Seller">Retail & Online Seller</option>
-                    <option value="Trade Compliance Specialist">Compliance Specialist</option>
+                    <option value="GST & E-Way Specialist">GST & E-Way Specialist</option>
                   </select>
                 </div>
               </div>
@@ -1081,7 +1093,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                 <textarea
                   required
                   rows={4}
-                  placeholder="Detail exact commodity specs, volume requirements, target certifications (APEDA, FSSAI, BIS CRS), packaging requirements, and timeline..."
+                  placeholder="Detail exact commodity specs, volume requirements, target certifications (FSSAI, AGMARK, BIS CRS, LMPC), GST/E-Way terms, and delivery timeline..."
                   value={newPostForm.content}
                   onChange={(e) => setNewPostForm({ ...newPostForm, content: e.target.value })}
                   className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/[0.04] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 resize-none font-light"
@@ -1110,30 +1122,35 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Incoterm</label>
+                  <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Freight Term</label>
                   <select
                     value={newPostForm.incoterm}
                     onChange={(e) => setNewPostForm({ ...newPostForm, incoterm: e.target.value as any })}
                     className="w-full px-2 py-1 rounded bg-white dark:bg-[#111218] border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs mt-0.5"
                   >
+                    <option value="FOR">FOR</option>
+                    <option value="DDP">DDP</option>
+                    <option value="EXW">EXW</option>
                     <option value="CIF">CIF</option>
                     <option value="FOB">FOB</option>
-                    <option value="DDP">DDP</option>
                     <option value="CFR">CFR</option>
-                    <option value="EXW">EXW</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Destination</label>
+                  <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Destination Hub</label>
                   <input
                     type="text"
-                    placeholder="e.g. Jebel Ali / Nhava Sheva"
+                    placeholder="e.g. Bhiwandi / Bengaluru"
                     value={newPostForm.destination}
                     onChange={(e) => setNewPostForm({ ...newPostForm, destination: e.target.value })}
                     className="w-full px-2 py-1 rounded bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs mt-0.5"
                   />
                 </div>
               </div>
+
+              {newPostError && (
+                <p className="text-[11px] text-rose-600 dark:text-rose-400">{newPostError}</p>
+              )}
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-white/10">
                 <button
@@ -1173,7 +1190,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
 
             <div className="flex items-center gap-2 text-xs font-mono text-amber-800 dark:text-amber-300 uppercase font-medium">
               <BookOpen className="w-3.5 h-3.5" />
-              <span>{selectedInsight.corridor === 'export_agro' ? 'Food & Agro Export Intelligence' : 'Electronics Import Intelligence'} · {selectedInsight.readTime}</span>
+              <span>{selectedInsight.corridor === 'export_agro' ? 'State Agro Dispatch Intelligence' : 'Electronics Supply Intelligence'} · {selectedInsight.readTime}</span>
             </div>
 
             <h3 className="text-xl font-serif font-semibold text-slate-900 dark:text-white">
@@ -1190,7 +1207,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
 
             <div className="space-y-2">
               <h4 className="text-xs font-mono uppercase text-slate-500 dark:text-slate-400 tracking-wider font-semibold">
-                Regulatory Takeaways & Port Protocols
+                Regulatory Takeaways & Hub Protocols
               </h4>
               <div className="space-y-1.5">
                 {selectedInsight.keyTakeaways.map((k, idx) => (
@@ -1204,7 +1221,7 @@ export function TradeCommunityHub({ onOpenOrderModal }: TradeCommunityHubProps) 
 
             <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-xs">
               <span className="font-mono text-[11px] uppercase text-amber-800 dark:text-amber-300 font-semibold block">
-                Eximora Asset-Light Sourcing Standard:
+                Tiffora Asset-Light Sourcing Standard:
               </span>
               <p className="text-slate-700 dark:text-slate-300 mt-1 font-light leading-relaxed">
                 {selectedInsight.operationalImpact}

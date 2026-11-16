@@ -133,13 +133,13 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
         <div>
           <div className="flex items-center gap-2 text-xs font-mono tracking-widest uppercase text-amber-800 dark:text-amber-300/80 mb-2 font-semibold">
             <TrendingUp className="w-3.5 h-3.5 text-amber-700 dark:text-amber-300" />
-            <span>Two-Way Trade Volume Tracking</span>
+            <span>Two-Way Interstate Volume Tracking</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-serif text-slate-900 dark:text-white tracking-tight">
             Market Performance & Volume Trends
           </h2>
           <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl font-light">
-            Live volume tracking across Eximora's bilateral corridors. Exporting agricultural bounty from Indian producers overseas, and importing high-demand electronics for Indian trade sellers.
+            Live volume tracking across Tiffora's interstate corridors. Dispatching agricultural surplus from producer states nationwide, and supplying certified electronics from metro hubs to state retail sellers.
           </p>
         </div>
 
@@ -174,7 +174,7 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Combined Bilateral ({orders.length})
+                Combined Interstate ({orders.length})
               </button>
               <button
                 type="button"
@@ -186,7 +186,7 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
                 }`}
               >
                 <Wheat className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Food Export ({metrics.exportOrders.length})</span>
+                <span>State Agro Dispatch ({metrics.exportOrders.length})</span>
               </button>
               <button
                 type="button"
@@ -198,7 +198,7 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
                 }`}
               >
                 <Cpu className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                <span>Electronics Import ({metrics.importOrders.length})</span>
+                <span>Metro Tech Supply ({metrics.importOrders.length})</span>
               </button>
             </div>
           </div>
@@ -226,11 +226,11 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
             </p>
           </div>
 
-          {/* Card 2: Food Export Volume */}
+          {/* Card 2: State Agro Dispatch Volume */}
           <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10">
             <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1 font-semibold">
               <Wheat className="w-3 h-3" />
-              <span>Food Export Volume</span>
+              <span>State Agro Dispatch</span>
             </span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-xl sm:text-2xl font-serif font-bold text-slate-900 dark:text-white tabular-nums">
@@ -239,15 +239,15 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
               <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">MT</span>
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              {metrics.exportOrders.length === 0 ? 'No export contracts queued' : `${metrics.exportOrders.length} active export dockets`}
+              {metrics.exportOrders.length === 0 ? 'No agro dispatches queued' : `${metrics.exportOrders.length} active state dockets`}
             </p>
           </div>
 
-          {/* Card 3: Electronics Import Volume */}
+          {/* Card 3: Metro Tech Supply Volume */}
           <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10">
             <span className="text-[11px] font-mono uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1 font-semibold">
               <Cpu className="w-3 h-3" />
-              <span>Electronics Import</span>
+              <span>Electronics Supply</span>
             </span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-xl sm:text-2xl font-serif font-bold text-slate-900 dark:text-white tabular-nums">
@@ -256,7 +256,7 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
               <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">Units</span>
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              {metrics.importOrders.length === 0 ? 'No import contracts queued' : `${metrics.importOrders.length} active import dockets`}
+              {metrics.importOrders.length === 0 ? 'No electronics dockets queued' : `${metrics.importOrders.length} active supply dockets`}
             </p>
           </div>
 
@@ -283,18 +283,18 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-amber-600 dark:text-amber-300" />
               <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">
-                Bilateral Trade Volume Distribution
+                Interstate Trade Volume Distribution
               </h3>
             </div>
             {hasOrders && (
               <div className="flex items-center gap-4 text-xs font-mono text-slate-600 dark:text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />
-                  <span>Food Export (MT)</span>
+                  <span>State Agro Dispatch (MT)</span>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
-                  <span>Electronics Import (Units)</span>
+                  <span>Electronics Supply (Units)</span>
                 </span>
               </div>
             )}
@@ -336,7 +336,7 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
                     <Area
                       type="monotone"
                       dataKey="exportVolumeMT"
-                      name="Food Exports (MT)"
+                      name="State Agro Dispatch (MT)"
                       stroke="#059669"
                       strokeWidth={2}
                       fillOpacity={1}
@@ -347,7 +347,7 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
                   {(selectedCorridor === 'all' || selectedCorridor === 'import_electronics') && (
                     <Bar
                       dataKey="importVolumeUnits"
-                      name="Electronics Imports (Units)"
+                      name="Electronics Supply (Units)"
                       fill="#d97706"
                       radius={[4, 4, 0, 0]}
                       maxBarSize={40}
@@ -394,19 +394,19 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-amber-600 dark:text-amber-300" />
               <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">
-                Bilateral Corridor Portfolio
+                Interstate Corridor Portfolio
               </h3>
             </div>
             <span className="text-xs font-mono text-slate-500">Asset-Light Sourcing</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Export Corridor Overview */}
+            {/* Agro Dispatch Corridor Overview */}
             <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/5">
                 <span className="text-xs font-mono uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 font-semibold">
                   <Wheat className="w-3.5 h-3.5" />
-                  <span>Export Corridor (Food & Agro)</span>
+                  <span>State Agro Dispatch (Producer → Buyer)</span>
                 </span>
                 <span className="text-xs font-mono text-slate-600 dark:text-slate-400">
                   {metrics.exportVolumeTotal.toLocaleString()} MT Registered
@@ -428,18 +428,18 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
               ) : (
                 <div className="py-6 px-3 text-center border border-dashed border-slate-200 dark:border-white/10 rounded-lg bg-slate-50/50 dark:bg-white/[0.01]">
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    No active export contracts queued. Sourced agro dockets will list here upon registration.
+                    No active agro dispatches queued. Sourced state FPO dockets will list here upon registration.
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Import Corridor Overview */}
+            {/* Electronics Supply Corridor Overview */}
             <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/5">
                 <span className="text-xs font-mono uppercase text-amber-700 dark:text-amber-300 flex items-center gap-1.5 font-semibold">
                   <Cpu className="w-3.5 h-3.5" />
-                  <span>Import Corridor (Electronic Accessories)</span>
+                  <span>Electronics Supply (Metro → State Retail)</span>
                 </span>
                 <span className="text-xs font-mono text-slate-600 dark:text-slate-400">
                   {metrics.importVolumeTotal.toLocaleString()} Units Registered
@@ -461,7 +461,7 @@ export function MarketPerformanceDashboard({ orders = [], onOpenOrderModal }: Ma
               ) : (
                 <div className="py-6 px-3 text-center border border-dashed border-slate-200 dark:border-white/10 rounded-lg bg-slate-50/50 dark:bg-white/[0.01]">
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    No active import contracts queued. Procured electronics dockets will list here upon registration.
+                    No active electronics contracts queued. Metro hub supply dockets will list here upon registration.
                   </p>
                 </div>
               )}

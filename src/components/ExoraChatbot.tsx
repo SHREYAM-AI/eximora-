@@ -16,15 +16,15 @@ const INITIAL_MESSAGE: ChatMessage = {
   id: 'init-1',
   role: 'assistant',
   content:
-    'Greetings. I am Exora, your AI trade concierge at Eximora. You can inquire about our bilateral corridors or place an order directly with AI—I will register your trade query, route it into execution (sourcing & certification), and track it through to fulfillment. How may I assist you today?',
+    'Greetings. I am Tiffora AI, your interstate trade concierge. You can inquire about our interstate corridors across India, ask about our upcoming Tiffy venture, or place an order directly with AI—I will register your state-to-state trade query, route it into execution (sourcing, FSSAI/BIS certification & E-Way billing), and track it through to fulfillment. How may I assist you today?',
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
 };
 
 const SUGGESTIONS = [
   'Place an order with AI',
-  'How does food export from India work?',
-  'What electronic accessories do you import?',
-  'Explain the asset-light model',
+  'Tell me about Tiffy (Coming Soon)',
+  'How does interstate food supply work?',
+  'What electronic accessories do you distribute?',
 ];
 
 export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
@@ -100,7 +100,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
         role: 'assistant',
         content:
           data.reply ||
-          'Eximora facilitates cross-border two-way trade: exporting certified Indian agro & food products, and importing high-demand electronic accessories for Indian retail.',
+          'Tiffora facilitates interstate two-way trade across India: dispatching certified food products from farmer producer states to buyer states, procuring high-demand electronic accessories from metro hubs for state wholesalers and retailers, and preparing the upcoming launch of Tiffy.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
@@ -108,24 +108,27 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
     } catch {
       // Graceful smart fallback
       let fallbackText =
-        'Eximora operates as an asset-light, two-way trading house. We source certified Indian agro and food products for overseas buyers, and procure electronic accessories for Indian retailers. We source, certify, ship, and sell.';
+        'Tiffora operates as an asset-light, two-way interstate trading house across India. We source certified agro and food products from agrarian states for buyer states, and procure electronic accessories from metro tech hubs for regional retailers. We source, certify, ship, and sell.';
 
       const lower = textToSend.toLowerCase();
-      if (lower.includes('order') || lower.includes('place order') || lower.includes('buy') || lower.includes('procure')) {
+      if (lower.includes('tiffy')) {
         fallbackText =
-          'You can place an order directly with AI using our AI Order Placement Desk! Exora will register your commercial trade query, validate tariff and compliance specs, move it into execution (certified farmer/processor or electronics OEM sourcing), and track it through to final delivery fulfillment.';
+          'Tiffy is Tiffora’s upcoming farm-direct staples and everyday food essentials initiative, currently marked Coming Soon. You can click "Notify Me on Launch" in the Tiffy section or select Tiffy Early Access on the registration form to join the launch waitlist.';
+      } else if (lower.includes('order') || lower.includes('place order') || lower.includes('buy') || lower.includes('procure')) {
+        fallbackText =
+          'You can place an order directly with AI using our AI Order Placement Desk! Tiffora AI will register your interstate trade query, validate IGST/HSN and E-Way Bill specs, move it into execution (certified FPO/processor or electronics hub sourcing), and track it through to state-level delivery fulfillment.';
       } else if (lower.includes('food') || lower.includes('farmer') || lower.includes('export') || lower.includes('agro')) {
         fallbackText =
-          'Our Food Export corridor connects certified Indian farmers and food processors directly to overseas commercial buyers. We manage quality certification, compliance testing, export packaging, and shipping without operating manufacturing facilities.';
+          'Our State Agro Corridor connects certified Indian farmers and FPOs in surplus states like Punjab, Gujarat, and MP directly to commercial buyers in Maharashtra, Karnataka, Delhi NCR, and Tamil Nadu. We handle AGMARK/FSSAI quality testing, grading, and E-Way insured trucking.';
       } else if (lower.includes('electronic') || lower.includes('accessory') || lower.includes('import') || lower.includes('retail')) {
         fallbackText =
-          'Our Electronics Import corridor sources high-demand accessories (charging solutions, cables, audio accessories, wearable peripherals) directly from verified global manufacturers to supply Indian wholesalers, retailers, and online merchants.';
+          'Our Electronics Corridor sources high-demand accessories (GaN chargers, Type-C cables, power banks, audio peripherals) from metro manufacturing hubs like Noida, Chennai, and Mumbai to supply state wholesalers, multi-brand retailers, and e-commerce sellers.';
       } else if (lower.includes('asset-light') || lower.includes('model') || lower.includes('manufacture')) {
         fallbackText =
-          'Being asset-light means Eximora does not own factories or heavy manufacturing machinery. Instead, we orchestrate the four core pillars: Sourcing high-grade products, Certifying quality and compliance, Shipping through global cold/dry logistics, and Selling to commercial counterparties.';
+          'Being asset-light means Tiffora does not own factories or manufacturing facilities. Instead, we orchestrate the four core pillars across state borders: Sourcing verified stock, Certifying FSSAI/BIS standards, Shipping via express road and CONCOR rail, and Selling to commercial counterparties.';
       } else if (lower.includes('register') || lower.includes('buyer') || lower.includes('contact') || lower.includes('waitlist')) {
         fallbackText =
-          'You can register your interest directly using the form on this page, or click "Place Order with AI" to register an active procurement query into our execution pipeline.';
+          'You can register your interest directly using the form on this page, or click "Place Order with AI" to register an active interstate procurement query into our execution pipeline.';
       }
 
       const assistantMsg: ChatMessage = {
@@ -162,7 +165,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
               type="button"
               onClick={() => setIsOpen(true)}
               className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-white dark:bg-gradient-to-r dark:from-[#12131A] dark:via-[#161822] dark:to-[#12131A] border border-amber-500/40 dark:border-amber-400/40 hover:border-amber-500 dark:hover:border-amber-400/80 text-slate-900 dark:text-white shadow-xl shadow-slate-900/10 dark:shadow-amber-950/40 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer backdrop-blur-md"
-              aria-label="Open Exora AI Trade Concierge"
+              aria-label="Open Tiffora AI Trade Concierge"
             >
               <div className="relative">
                 <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-400/15 border border-amber-300 dark:border-amber-400/40 flex items-center justify-center text-amber-800 dark:text-amber-300">
@@ -173,7 +176,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
 
               <div className="text-left hidden sm:block">
                 <div className="flex items-center gap-1.5 leading-none">
-                  <span className="text-xs font-semibold tracking-wide text-slate-900 dark:text-white font-serif">Exora</span>
+                  <span className="text-xs font-semibold tracking-wide text-slate-900 dark:text-white font-serif">Tiffora</span>
                   <span className="text-[10px] font-mono text-amber-800 dark:text-amber-300/80 font-medium">AI</span>
                 </div>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">Trade Concierge</span>
@@ -187,7 +190,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Exora Chatbot"
+          aria-label="Tiffora AI Chatbot"
           className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[85vh] bg-white/95 dark:bg-[#0A0B10] border border-slate-200 dark:border-white/15 rounded-2xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-bottom-6 duration-200"
         >
           {/* Header */}
@@ -201,12 +204,12 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">Exora</h3>
+                  <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">Tiffora AI</h3>
                   <span className="text-[10px] font-mono tracking-wider uppercase text-amber-800 dark:text-amber-300/80 bg-amber-50 dark:bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-400/20 font-medium">
                     Trade AI
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Eximora Trade Concierge</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Tiffora Trade Concierge</span>
               </div>
             </div>
 
@@ -224,8 +227,8 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors border border-transparent hover:border-slate-300 dark:hover:border-white/10 cursor-pointer"
-                title="Minimize Exora"
-                aria-label="Minimize Exora"
+                title="Minimize Tiffora AI"
+                aria-label="Minimize Tiffora AI"
               >
                 <ChevronDown className="w-4 h-4" />
               </button>
@@ -233,8 +236,8 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors border border-transparent hover:border-slate-300 dark:hover:border-white/10 cursor-pointer"
-                title="Close Exora"
-                aria-label="Close Exora"
+                title="Close Tiffora AI"
+                aria-label="Close Tiffora AI"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -331,7 +334,7 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask Exora about bilateral trade corridors..."
+                placeholder="Ask Tiffora AI about interstate corridors or Tiffy..."
                 className="flex-1 bg-white dark:bg-white/[0.04] border border-slate-300 dark:border-white/10 focus:border-amber-500 dark:focus:border-amber-400/50 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none transition-colors shadow-xs"
                 disabled={isLoading}
               />
@@ -339,14 +342,14 @@ export function ExoraChatbot({ onOpenOrderModal }: ExoraChatbotProps) {
                 type="submit"
                 disabled={!input.trim() || isLoading}
                 className="p-2 bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 text-black rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-xs"
-                aria-label="Send message to Exora"
+                aria-label="Send message to Tiffora AI"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
             </form>
             <div className="mt-2 text-center">
               <span className="text-[10px] text-slate-500 font-mono">
-                Exora Concierge · Eximora Bilateral Trade Desk
+                Tiffora AI Concierge · Tiffora Interstate Trade Desk
               </span>
             </div>
           </div>

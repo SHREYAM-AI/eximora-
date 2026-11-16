@@ -27,27 +27,27 @@ interface AiOrderPlacementModalProps {
 const SAMPLE_PROMPTS = [
   {
     corridor: 'export_agro' as TradeCorridor,
-    title: 'Food Export: 24 MT Basmati Rice to Dubai',
+    title: 'State Agro Dispatch: 24 MT Basmati Rice to Bhiwandi',
     prompt:
-      'We require 24 Metric Tons of Grade-A 1121 Steam Basmati Rice shipped to Jebel Ali Port, Dubai under CIF terms. Must include APEDA phytosanitary testing and moisture content under 12%. Pack in 25kg vacuum-sealed master gunny bags.',
+      'We require 24 Metric Tons of Grade-A 1121 Steam Basmati Rice dispatched from Ludhiana (Punjab) to Bhiwandi Logistics Park, Maharashtra under FOR Ludhiana terms. Must include FSSAI Interstate & AGMARK testing with moisture content under 12%. Pack in 25kg laminated master bags with e-Way Bill.',
   },
   {
     corridor: 'export_agro' as TradeCorridor,
-    title: 'Food Export: 15 MT Organic Spices to Rotterdam',
+    title: 'State Agro Dispatch: 15 MT Unjha Cumin & Turmeric to Bengaluru',
     prompt:
-      'Looking to import 15 Metric Tons of certified organic turmeric fingers and crushed black pepper from Andhra Pradesh to Port of Rotterdam, Netherlands. Need EU pesticide residue lab certificates and Spices Board analytical clearance under FOB Nhava Sheva.',
+      'Looking to procure 15 Metric Tons of machine-cleaned Unjha cumin seeds and Nizamabad organic turmeric fingers from Gujarat & Telangana to Yeshwanthpur APMC, Bengaluru. Need FSSAI lab clearance, IGST invoice, and NIC E-Way Bill under DDP terms.',
   },
   {
     corridor: 'import_electronics' as TradeCorridor,
-    title: 'Electronics Import: 4,000 GaN 65W Chargers for Delhi Retail',
+    title: 'Electronics Supply: 4,000 GaN 65W Chargers to Jaipur & Lucknow',
     prompt:
-      'Procure 4,000 units of 65W GaN dual-port USB-C fast wall chargers for our retail chain across Delhi NCR and Bengaluru. Must possess active BIS CRS registration (IS 13252) and Indian Type D/M pins. DDP delivery to our central warehouse in Okhla.',
+      'Procure 4,000 units of 65W GaN dual-port USB-C fast wall chargers from Delhi NCR / Noida Hub for our multi-brand retail chain across Jaipur and Lucknow. Must carry BIS CRS registration (IS 13252), Legal Metrology LMPC MRP labels, and IGST tax invoice.',
   },
   {
     corridor: 'import_electronics' as TradeCorridor,
-    title: 'Electronics Import: 10,000 Braided Type-C Fast Cables',
+    title: 'Electronics Supply: 10,000 Braided Type-C Cables to Hyderabad',
     prompt:
-      'We need 10,000 units of 100W PD nylon-braided USB-C to USB-C cables (1.5m, 480Mbps, aluminum alloy housing) for e-commerce distribution in Mumbai. RoHS 2.0 certified with retail blister packaging.',
+      'We need 10,000 units of 100W PD nylon-braided USB-C to USB-C cables (1.5m, 480Mbps, aluminum housing) from Chennai Sriperumbudur Hub for e-commerce fulfillment in Hyderabad & Pune. BIS/RoHS certified with retail blister packaging.',
   },
 ];
 
@@ -79,7 +79,7 @@ export function AiOrderPlacementModal({
   const [unit, setUnit] = useState('Metric Tons');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [incoterm, setIncoterm] = useState<'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW'>('CIF');
+  const [incoterm, setIncoterm] = useState<'FOR' | 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW'>('FOR');
   const [clientCompany, setClientCompany] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientName, setClientName] = useState('');
@@ -104,7 +104,7 @@ export function AiOrderPlacementModal({
 
     if (mode === 'structured') {
       if (!productName.trim() || !quantity.trim() || !destination.trim()) {
-        setError('Please provide product name, quantity, and destination port.');
+        setError('Please provide product name, quantity, and destination city or state hub.');
         return;
       }
     }
@@ -130,9 +130,9 @@ export function AiOrderPlacementModal({
         origin: mode === 'structured' ? origin : undefined,
         destination: mode === 'structured' ? destination : undefined,
         incoterm: mode === 'structured' ? incoterm : undefined,
-        clientName: clientName.trim() || (partyRole === 'vendor' ? 'Verified Trade Vendor' : 'Trade Account'),
-        clientCompany: clientCompany.trim() || (partyRole === 'vendor' ? 'Vendor Enterprise' : 'Commercial Partner'),
-        clientEmail: clientEmail.trim() || 'trade@enterprise.com',
+        clientName: clientName.trim() || (partyRole === 'vendor' ? 'Verified State Supplier' : 'Trade Account'),
+        clientCompany: clientCompany.trim() || (partyRole === 'vendor' ? 'Vendor Enterprise' : 'Interstate Partner'),
+        clientEmail: clientEmail.trim() || 'trade@enterprise.in',
         partyRole,
         partyRoleLabel,
         specialInstructions: mode === 'natural' ? promptInput : 'Commercial packaging and compliance verified.',
@@ -159,7 +159,7 @@ export function AiOrderPlacementModal({
       console.warn('Network error placing order, generating client-side fallback order', err);
 
       // Resilient fallback order creation
-      const orderPrefix = corridor === 'export_agro' ? 'EXM-AGRO' : 'EXM-ELEC';
+      const orderPrefix = corridor === 'export_agro' ? 'TIF-AGRO' : 'TIF-ELEC';
       const orderNumber = `${orderPrefix}-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       const now = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
 
@@ -181,48 +181,48 @@ export function AiOrderPlacementModal({
           mode === 'structured' && origin
             ? origin
             : corridor === 'export_agro'
-            ? 'India'
-            : 'Global Tech Hub',
+            ? 'Ludhiana, Punjab'
+            : 'Delhi NCR / Noida Hub',
         destination:
           mode === 'structured' && destination
             ? destination
             : corridor === 'export_agro'
-            ? 'International Destination Port'
-            : 'India Port/ICD',
-        incoterm: mode === 'structured' ? incoterm : corridor === 'export_agro' ? 'CIF' : 'DDP',
-        clientName: clientName || (partyRole === 'vendor' ? 'Verified Trade Vendor' : 'Client Trade Account'),
-        clientCompany: clientCompany || (partyRole === 'vendor' ? 'Vendor Enterprise' : 'Commercial Partner'),
-        clientEmail: clientEmail || 'trade@enterprise.com',
+            ? 'Bhiwandi, Maharashtra'
+            : 'Bengaluru, Karnataka',
+        incoterm: mode === 'structured' ? incoterm : corridor === 'export_agro' ? 'FOR' : 'DDP',
+        clientName: clientName || (partyRole === 'vendor' ? 'Verified State Supplier' : 'Client Trade Account'),
+        clientCompany: clientCompany || (partyRole === 'vendor' ? 'Vendor Enterprise' : 'Interstate Partner'),
+        clientEmail: clientEmail || 'trade@enterprise.in',
         partyRole,
         partyRoleLabel:
           partyRole === 'vendor'
-            ? 'Verified Trade Vendor'
+            ? 'Verified State Supplier'
             : partyRole === 'processor'
-            ? 'Agricultural Processor'
+            ? 'Regional Agro Processor'
             : partyRole === 'wholesaler'
-            ? 'Wholesale Retailer'
-            : 'Commercial Buyer',
+            ? 'State Wholesaler'
+            : 'Interstate Buyer',
         placedAtIso: new Date().toISOString(),
         certificationsRequired:
           corridor === 'export_agro'
-            ? ['APEDA Phytosanitary', 'FSSAI Laboratory Certificate', 'ISO 22000']
-            : ['BIS CRS (IS 13252)', 'CE Compliance', 'RoHS 2.0'],
+            ? ['FSSAI Interstate License', 'AGMARK Grade Audit', 'NIC E-Way Bill & IGST']
+            : ['BIS CRS (IS 13252)', 'Legal Metrology (LMPC)', 'NIC E-Way Bill & IGST'],
         hsnCode: corridor === 'export_agro' ? '1006.30.20' : '8504.40.90',
         stage: 'registered',
         progressPercent: 25,
         registeredAt: now,
         lastUpdated: now,
         aiQueryAnalysis: {
-          summary: `AI has registered the trade requirement for ${corridor === 'export_agro' ? 'Indian Agro/Food Export' : 'Electronic Accessories Import'}.`,
+          summary: `AI has registered the interstate trade requirement for ${corridor === 'export_agro' ? 'State Agro / Food Dispatch' : 'Interstate Electronic Accessories Supply'}.`,
           riskAssessment: 'Low Risk',
           assetLightAction:
             corridor === 'export_agro'
-              ? 'Allocating directly to verified farmer cooperatives and APEDA certified dry millers.'
-              : 'Routing specifications to accredited ISO/BIS registered electronics manufacturing partners.',
+              ? 'Allocating directly to verified state farmer cooperatives (FPOs) and AGMARK-certified dry millers.'
+              : 'Routing specifications to BIS/LMPC-registered metro electronics fulfillment partners.',
           matchedNetwork:
             corridor === 'export_agro'
-              ? 'Verified Indian Agricultural Producer Network #09'
-              : 'High-Reliability Electronics Partner Hub #12',
+              ? 'Verified Indian State FPO & Mandi Network #09'
+              : 'Metro Electronics Supply Hub #12 (NCR / Chennai)',
         },
         milestones: [
           {
@@ -230,39 +230,39 @@ export function AiOrderPlacementModal({
             title: 'AI Order Query Registered & Parsed',
             timestamp: now,
             completed: true,
-            notes: 'Exora AI validated trade terms, compliance specifications, and tariff coding.',
+            notes: 'Tiffora AI validated interstate freight terms, E-Way/IGST rules, and HSN coding.',
             category: 'query',
           },
           {
             id: 'm-2',
-            title: 'Asset-Light Sourcing Matching',
+            title: 'Asset-Light State Sourcing Matching',
             timestamp: 'Queued for Execution',
             completed: false,
-            notes: 'Allocating production quota without manufacturing overhead.',
+            notes: 'Allocating stock quota across origin state FPOs or metro tech hubs without warehousing overhead.',
             category: 'sourcing',
           },
           {
             id: 'm-3',
-            title: 'Quality & Regulatory Certification Audit',
+            title: 'Quality, BIS/FSSAI & GST Audit',
             timestamp: 'Pending Execution',
             completed: false,
-            notes: 'Independent pre-shipment lab testing and certificates.',
+            notes: 'Independent batch quality testing, LMPC/AGMARK verification, and IGST invoice check.',
             category: 'certification',
           },
           {
             id: 'm-4',
-            title: 'Freight Containerization & Booking',
+            title: 'E-Way Bill & Highway / Rail Dispatch',
             timestamp: 'Pending Execution',
             completed: false,
-            notes: 'Container slot allocation, Bill of Lading, and export dispatch.',
+            notes: 'NIC E-Way Bill generation, LR docket issuance, and container truck or CONCOR rail loading.',
             category: 'shipping',
           },
           {
             id: 'm-5',
-            title: 'Destination Fulfillment & Handover',
+            title: 'Destination State Handover & POD',
             timestamp: 'Pending Fulfillment',
             completed: false,
-            notes: 'Customs clearance and final delivery acknowledgment.',
+            notes: 'Interstate hub unloading, weighbridge verification, and Proof of Delivery (POD).',
             category: 'delivery',
           },
         ],
@@ -371,18 +371,18 @@ export function AiOrderPlacementModal({
                 </div>
 
                 <div className="p-3 rounded-lg bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 shadow-xs">
-                  <span className="text-[10px] uppercase font-mono text-slate-500 block">Logistics Route & Incoterm</span>
+                  <span className="text-[10px] uppercase font-mono text-slate-500 block">Interstate Route & Freight Term</span>
                   <span className="text-amber-800 dark:text-amber-200 font-medium text-sm mt-0.5 block">
                     {createdOrder.incoterm} · {createdOrder.destination}
                   </span>
-                  <span className="text-slate-500 dark:text-slate-400 text-[11px]">Origin: {createdOrder.origin}</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[11px]">Origin State Hub: {createdOrder.origin}</span>
                 </div>
               </div>
 
               {/* Asset-light plan */}
               <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-400/[0.04] border border-amber-200 dark:border-amber-400/15 text-xs space-y-1">
                 <span className="font-mono text-[10px] uppercase tracking-wider text-amber-800 dark:text-amber-300 block font-semibold">
-                  Eximora Asset-Light Sourcing Strategy
+                  Tiffora Asset-Light Sourcing Strategy
                 </span>
                 <p className="text-slate-700 dark:text-slate-300 font-light">{createdOrder.aiQueryAnalysis.assetLightAction}</p>
                 <p className="text-slate-500 dark:text-slate-400 text-[11px] pt-1 font-mono">
@@ -456,7 +456,7 @@ export function AiOrderPlacementModal({
             {/* Corridor Selection */}
             <div>
               <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-semibold">
-                Select Bilateral Trade Corridor
+                Select Two-Way Interstate Trade Corridor
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
@@ -464,6 +464,7 @@ export function AiOrderPlacementModal({
                   onClick={() => {
                     setCorridor('export_agro');
                     setUnit('Metric Tons');
+                    setIncoterm('FOR');
                   }}
                   className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                     corridor === 'export_agro'
@@ -473,11 +474,11 @@ export function AiOrderPlacementModal({
                 >
                   <div className="flex items-center gap-2 text-xs font-mono uppercase font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
                     <Wheat className="w-4 h-4" />
-                    <span>Export Corridor (India → World)</span>
+                    <span>State Agro Export (Surplus → Buyer States)</span>
                   </div>
                   <h4 className="text-sm font-serif font-medium text-slate-900 dark:text-white">Food & Agricultural Products</h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    Sourced from certified Indian farmers & processors (Basmati rice, spices, pulses, processed food).
+                    Dispatched from FPOs & dry millers in Punjab, Gujarat, MP & AP to consumer state wholesale hubs.
                   </p>
                 </button>
 
@@ -486,6 +487,7 @@ export function AiOrderPlacementModal({
                   onClick={() => {
                     setCorridor('import_electronics');
                     setUnit('Units');
+                    setIncoterm('DDP');
                   }}
                   className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                     corridor === 'import_electronics'
@@ -495,11 +497,11 @@ export function AiOrderPlacementModal({
                 >
                   <div className="flex items-center gap-2 text-xs font-mono uppercase font-semibold text-amber-800 dark:text-amber-300 mb-1">
                     <Cpu className="w-4 h-4" />
-                    <span>Import Corridor (World → India)</span>
+                    <span>Electronics Supply (Metro Hubs → State Retail)</span>
                   </div>
                   <h4 className="text-sm font-serif font-medium text-slate-900 dark:text-white">Electronic Accessories</h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    Imported for Indian wholesalers, retailers, and online sellers (GaN chargers, audio, cables).
+                    Procured from Delhi NCR, Chennai & Mumbai tech hubs for state wholesalers, retailers & online sellers.
                   </p>
                 </button>
               </div>
@@ -533,7 +535,7 @@ export function AiOrderPlacementModal({
               </div>
 
               <span className="text-[10px] font-mono text-amber-800 dark:text-amber-300/80 font-medium hidden sm:inline">
-                Asset-Light Sourcing · Certified Quality · Global Logistics
+                Asset-Light Sourcing · FSSAI/BIS Certified · Pan-India Logistics
               </span>
             </div>
 
@@ -545,7 +547,7 @@ export function AiOrderPlacementModal({
                     rows={4}
                     value={promptInput}
                     onChange={(e) => setPromptInput(e.target.value)}
-                    placeholder={`Describe your trade requirements in plain language... (e.g., "We want to order 20 Metric Tons of organic Basmati rice shipped to Jebel Ali under CIF terms with APEDA certification" or "Procure 5,000 units of 65W GaN dual-port chargers for retail in Delhi with BIS approval")`}
+                    placeholder={`Describe your interstate trade requirement in plain language... (e.g., "Dispatch 20 Metric Tons of 1121 Basmati rice from Ludhiana, Punjab to Bhiwandi, Maharashtra under FOR terms with FSSAI & E-Way Bill" or "Procure 5,000 units of 65W GaN chargers from Noida Hub for Jaipur retail with BIS CRS approval")`}
                     className="w-full p-4 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/15 focus:border-amber-500 dark:focus:border-amber-400/50 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none transition-colors resize-none leading-relaxed shadow-xs"
                   />
                   <div className="absolute bottom-3 right-3 text-[10px] font-mono text-slate-500 flex items-center gap-1">
@@ -622,8 +624,8 @@ export function AiOrderPlacementModal({
                         <option value="Metric Tons">Metric Tons</option>
                         <option value="Units">Units</option>
                         <option value="Cartons">Cartons</option>
-                        <option value="20ft FCL">20ft FCL Container</option>
-                        <option value="40ft FCL">40ft FCL Container</option>
+                        <option value="32ft MXL Truck">32ft MXL Container Truck</option>
+                        <option value="Rail Wagon">CONCOR Domestic Rail</option>
                       </select>
                     </div>
                   </div>
@@ -631,40 +633,41 @@ export function AiOrderPlacementModal({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Origin Hub / Region</label>
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Origin State Hub</label>
                     <input
                       type="text"
                       value={origin}
                       onChange={(e) => setOrigin(e.target.value)}
-                      placeholder={corridor === 'export_agro' ? 'e.g. Punjab / Haryana, India' : 'e.g. Shenzhen OEM Hub'}
+                      placeholder={corridor === 'export_agro' ? 'e.g. Ludhiana, Punjab' : 'e.g. Noida Electronics Hub'}
                       className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Destination Port / Hub *</label>
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Destination City / State *</label>
                     <input
                       type="text"
                       required
                       value={destination}
                       onChange={(e) => setDestination(e.target.value)}
-                      placeholder={corridor === 'export_agro' ? 'e.g. Port of Jebel Ali, Dubai' : 'e.g. Delhi ICD / Mumbai'}
+                      placeholder={corridor === 'export_agro' ? 'e.g. Bhiwandi, Maharashtra' : 'e.g. Bengaluru, Karnataka'}
                       className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Incoterms</label>
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Freight Term</label>
                     <select
                       value={incoterm}
                       onChange={(e) => setIncoterm(e.target.value as any)}
                       className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#12131A] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                     >
-                      <option value="CIF">CIF (Cost, Insurance & Freight)</option>
-                      <option value="FOB">FOB (Free On Board)</option>
-                      <option value="CFR">CFR (Cost and Freight)</option>
-                      <option value="DDP">DDP (Delivered Duty Paid)</option>
-                      <option value="EXW">EXW (Ex Works)</option>
+                      <option value="FOR">FOR (Free On Rail / Truck)</option>
+                      <option value="DDP">DDP (Delivered Doorstep · IGST Paid)</option>
+                      <option value="EXW">EXW (Ex-Mandi / Ex-Warehouse)</option>
+                      <option value="CIF">CIF (Freight & Transit Insured)</option>
+                      <option value="FOB">FOB (Origin Loading Dock)</option>
+                      <option value="CFR">CFR (Freight Prepaid)</option>
                     </select>
                   </div>
                 </div>
@@ -722,8 +725,8 @@ export function AiOrderPlacementModal({
                       : 'bg-slate-50/70 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
-                  <span className="block text-slate-900 dark:text-white font-bold">Overseas Buyer</span>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">Port Delivery</span>
+                  <span className="block text-slate-900 dark:text-white font-bold">State Buyer</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">State Hub Delivery</span>
                 </button>
               </div>
             </div>
@@ -738,7 +741,7 @@ export function AiOrderPlacementModal({
                   type="text"
                   value={clientCompany}
                   onChange={(e) => setClientCompany(e.target.value)}
-                  placeholder={partyRole === 'vendor' ? 'e.g. Amritsar Agro Cooperative' : 'e.g. Gulf Horizon Foodstuffs LLC'}
+                  placeholder={partyRole === 'vendor' ? 'e.g. Amritsar FPO Cooperative' : 'e.g. Deccan Retail Foods Pvt Ltd'}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                 />
               </div>
@@ -749,7 +752,7 @@ export function AiOrderPlacementModal({
                   type="text"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  placeholder="e.g. Tariq Mansoor / Harpreet Singh"
+                  placeholder="e.g. Rajesh Sharma / Harpreet Singh"
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                 />
               </div>
@@ -760,7 +763,7 @@ export function AiOrderPlacementModal({
                   type="email"
                   value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="trade@enterprise.com"
+                  placeholder="procurement@enterprise.in"
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-300 dark:border-white/10 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-amber-500 dark:focus:border-amber-400/50"
                 />
               </div>

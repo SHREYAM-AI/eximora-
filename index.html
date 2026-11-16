@@ -9,25 +9,31 @@
         if (
           event.reason &&
           (event.reason.message?.includes('WebSocket') ||
-           event.reason.stack?.includes('@vite/client') ||
-           event.reason.message?.includes('closed without opened'))
+           event.reason.message?.includes('closed without opened') ||
+           (typeof event.reason.stack === 'string' && event.reason.stack.includes('@vite/client')))
         ) {
           event.preventDefault();
+          if (typeof event.stopImmediatePropagation === 'function') {
+            event.stopImmediatePropagation();
+          }
         }
-      });
+      }, true);
       window.addEventListener('error', function(event) {
         if (
           event.message?.includes('WebSocket') ||
-          event.filename?.includes('@vite/client')
+          (typeof event.filename === 'string' && event.filename.includes('@vite/client'))
         ) {
           event.preventDefault();
+          if (typeof event.stopImmediatePropagation === 'function') {
+            event.stopImmediatePropagation();
+          }
         }
-      });
+      }, true);
 
       // Synchronous theme initialization to avoid flash of wrong theme
       (function() {
         try {
-          var saved = localStorage.getItem('eximora_theme');
+          var saved = localStorage.getItem('tiffora_theme') || localStorage.getItem('eximora_theme');
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           if (saved === 'light') {
             document.documentElement.classList.remove('dark');
@@ -44,10 +50,10 @@
         }
       })();
     </script>
-    <title>Eximora — Cross-Border Two-Way Trading House</title>
-    <meta name="description" content="Eximora — Two-way cross-border trading house. Exporting Indian food products globally, importing electronic accessories for Indian commerce." />
-    <meta property="og:title" content="Eximora — Cross-Border Two-Way Trading House" />
-    <meta property="og:description" content="Eximora — Two-way cross-border trading house. Exporting Indian food products globally, importing electronic accessories for Indian commerce." />
+    <title>Tiffora — Interstate Two-Way Trading House</title>
+    <meta name="description" content="Tiffora — Two-way interstate import-export trading house. Supplying certified food products from farmer states across India, procuring electronic accessories from metro hubs, and launching Tiffy soon." />
+    <meta property="og:title" content="Tiffora — Interstate Two-Way Trading House" />
+    <meta property="og:description" content="Tiffora — Two-way interstate import-export trading house. Supplying certified food products from farmer states across India, procuring electronic accessories from metro hubs, and launching Tiffy soon." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com">

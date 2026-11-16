@@ -266,7 +266,7 @@ export function AdminCentreModal({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `eximora-admin-audit-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `tiffora-admin-audit-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -290,7 +290,7 @@ export function AdminCentreModal({
             <div>
               <div className="flex items-center gap-2">
                 <h2 id="admin-title" className="text-base font-serif font-semibold text-slate-900 dark:text-white tracking-wide">
-                  Eximora Operations & Intelligence Centre
+                  Tiffora Operations & Intelligence Centre
                 </h2>
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
@@ -302,7 +302,7 @@ export function AdminCentreModal({
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 font-mono mt-0.5">
-                Instant bilateral trade order surveillance & vendor placement surveillance
+                Instant interstate trade order surveillance & state vendor placement telemetry
               </p>
             </div>
           </div>
@@ -449,7 +449,7 @@ export function AdminCentreModal({
               <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Agro : Elec</span>
             </div>
             <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
-              Bilateral Trade Balancing
+              Interstate Trade Balancing
             </span>
           </div>
 
@@ -708,12 +708,12 @@ export function AdminCentreModal({
                                 {ord.corridor === 'export_agro' ? (
                                   <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-0.5">
                                     <Wheat className="w-2.5 h-2.5" />
-                                    <span>Agro Export</span>
+                                    <span>State Agro</span>
                                   </span>
                                 ) : (
                                   <span className="text-amber-800 dark:text-amber-300 flex items-center gap-0.5">
                                     <Cpu className="w-2.5 h-2.5" />
-                                    <span>Electronics Import</span>
+                                    <span>Electronics Supply</span>
                                   </span>
                                 )}
                                 <span>·</span>
@@ -903,12 +903,12 @@ export function AdminCentreModal({
                 <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 shadow-xs">
                   <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-700 dark:text-emerald-400">
                     <Wheat className="w-3.5 h-3.5" />
-                    <span>Food Export Interest</span>
+                    <span>State Agro Interest</span>
                   </div>
                   <div className="mt-1 text-2xl font-serif font-bold text-slate-900 dark:text-white tabular-nums">
                     {visitorStats.agroInterest}
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">Indian Agri Sourcing</span>
+                  <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">State Farmer Sourcing</span>
                 </div>
 
                 <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 shadow-xs">
@@ -919,7 +919,7 @@ export function AdminCentreModal({
                   <div className="mt-1 text-2xl font-serif font-bold text-slate-900 dark:text-white tabular-nums">
                     {visitorStats.elecInterest}
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">Accessories Procurement</span>
+                  <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">Metro Tech Procurement</span>
                 </div>
               </div>
 
@@ -940,7 +940,7 @@ export function AdminCentreModal({
                     <Globe className="w-8 h-8 mx-auto text-slate-400 dark:text-slate-500 mb-2" />
                     <h4 className="text-sm font-medium text-slate-900 dark:text-white">No External Sessions Recorded Yet</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto mt-1">
-                      Visitor sessions are logged in real time as clients access the website, explore corridors, or converse with Exora.
+                      Visitor sessions are logged in real time as clients access the website, explore corridors, or converse with Tiffora AI.
                     </p>
                   </div>
                 ) : (
@@ -984,12 +984,12 @@ export function AdminCentreModal({
                               {vis.corridorInterest === 'export_agro' ? (
                                 <span className="text-emerald-700 dark:text-emerald-400 inline-flex items-center gap-1 font-medium">
                                   <Wheat className="w-3 h-3" />
-                                  <span>Food Export</span>
+                                  <span>State Agro Dispatch</span>
                                 </span>
                               ) : vis.corridorInterest === 'import_electronics' ? (
                                 <span className="text-amber-800 dark:text-amber-300 inline-flex items-center gap-1 font-medium">
                                   <Cpu className="w-3 h-3" />
-                                  <span>Electronics Import</span>
+                                  <span>Electronics Supply</span>
                                 </span>
                               ) : (
                                 <span className="text-slate-500 dark:text-slate-400">General Overview</span>
@@ -1014,10 +1014,10 @@ export function AdminCentreModal({
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">
-                    Commercial Waitlist & Trade Registrations
+                    Commercial Waitlist & Interstate Trade Registrations
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                    Prospective importers, exporters, and wholesale partners registered for Eximora launch.
+                    Prospective state buyers, FPO cooperatives, and wholesale partners registered for Tiffora onboarding.
                   </p>
                 </div>
                 <span className="text-xs font-mono text-amber-800 dark:text-amber-300 font-semibold">
@@ -1073,7 +1073,7 @@ export function AdminCentreModal({
         <div className="px-6 py-3 border-t border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.01] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-mono">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-            <span>Eximora Operating Core · Live Node Connected</span>
+            <span>Tiffora Operating Core · Live Node Connected</span>
           </div>
           <span>Press ESC to exit Admin Centre</span>
         </div>

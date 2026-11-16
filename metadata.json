@@ -1,6 +1,6 @@
 {
   "name": "Eximora",
-  "description": "Eximora — Two-way cross-border trading house. Exporting Indian food products globally, importing electronic accessories for Indian commerce.",
+  "description": "Eximora — Two-way interstate import-export trading house. Sourcing certified food products from farmer states to buyer states, and supplying electronic accessories from metro hubs to Indian wholesalers and retailers.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

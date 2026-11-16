@@ -52,7 +52,7 @@ export function InquiryModal({ isOpen, onClose, defaultType = 'private' }: Inqui
     setTimeout(() => {
       // Save inquiry to localStorage
       try {
-        const stored = JSON.parse(localStorage.getItem('eximora_inquiries') || '[]');
+        const stored = JSON.parse(localStorage.getItem('tiffora_inquiries') || localStorage.getItem('eximora_inquiries') || '[]');
         stored.push({
           id: 'INQ-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
           fullName,
@@ -62,7 +62,7 @@ export function InquiryModal({ isOpen, onClose, defaultType = 'private' }: Inqui
           message,
           date: new Date().toISOString(),
         });
-        localStorage.setItem('eximora_inquiries', JSON.stringify(stored));
+        localStorage.setItem('tiffora_inquiries', JSON.stringify(stored));
       } catch {
         // localStorage fallback
       }
@@ -117,7 +117,7 @@ export function InquiryModal({ isOpen, onClose, defaultType = 'private' }: Inqui
             </div>
             <h3 className="text-lg font-serif text-slate-900 dark:text-white">Inquiry Received</h3>
             <p className="text-sm text-slate-600 dark:text-slate-300 max-w-sm mx-auto leading-relaxed">
-              Your message has been dispatched securely to the Eximora executive office. A liaison will respond under confidential cover if alignment is determined.
+              Your message has been dispatched securely to the Tiffora executive office. A liaison will respond under confidential cover if alignment is determined.
             </p>
             <div className="pt-4">
               <button
@@ -166,7 +166,7 @@ export function InquiryModal({ isOpen, onClose, defaultType = 'private' }: Inqui
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Katherine Sterling"
+                placeholder="e.g. Vikramaditya Kulkarni"
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 focus:border-amber-500 dark:focus:border-amber-400/50 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none transition-colors"
               />
             </div>
@@ -181,21 +181,21 @@ export function InquiryModal({ isOpen, onClose, defaultType = 'private' }: Inqui
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="liaison@institution.com"
+                placeholder="procurement@bharatretail.in"
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 focus:border-amber-500 dark:focus:border-amber-400/50 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none transition-colors"
               />
             </div>
 
             <div>
               <label htmlFor="inquiry-org" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Organization / Office <span className="text-slate-400 dark:text-slate-500">(Optional)</span>
+                Organization / Enterprise <span className="text-slate-400 dark:text-slate-500">(Optional)</span>
               </label>
               <input
                 id="inquiry-org"
                 type="text"
                 value={organization}
                 onChange={(e) => setOrganization(e.target.value)}
-                placeholder="e.g. Sterling Heritage Capital"
+                placeholder="e.g. Deccan Agro & Retail Distributors Pvt Ltd"
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/[0.03] border border-slate-300 dark:border-white/10 focus:border-amber-500 dark:focus:border-amber-400/50 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none transition-colors"
               />
             </div>

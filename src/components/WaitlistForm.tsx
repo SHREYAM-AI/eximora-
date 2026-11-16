@@ -8,17 +8,27 @@ interface WaitlistEntry {
   joinedAt: string;
 }
 
-export function WaitlistForm() {
+interface WaitlistFormProps {
+  externalCategory?: string | null;
+}
+
+export function WaitlistForm({ externalCategory }: WaitlistFormProps) {
   const [email, setEmail] = useState('');
-  const [category, setCategory] = useState('Overseas Buyer (Food)');
+  const [category, setCategory] = useState('State Agro Buyer (Food)');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [savedEntry, setSavedEntry] = useState<WaitlistEntry | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (externalCategory) {
+      setCategory(externalCategory);
+    }
+  }, [externalCategory]);
+
+  useEffect(() => {
     try {
-      const existing = localStorage.getItem('eximora_waitlist_entry');
+      const existing = localStorage.getItem('tiffora_waitlist_entry') || localStorage.getItem('eximora_waitlist_entry');
       if (existing) {
         setSavedEntry(JSON.parse(existing));
         setStatus('success');
@@ -43,7 +53,13 @@ export function WaitlistForm() {
 
     setTimeout(() => {
       // Deterministic or random VIP reservation sequence
-      const prefix = category.includes('Food') ? 'EXM-AGRO' : category.includes('Electronics') ? 'EXM-ELEC' : 'EXM-TRD';
+      const prefix = category.includes('Tiffy')
+        ? 'TIF-TFY'
+        : category.includes('Food')
+        ? 'TIF-AGRO'
+        : category.includes('Electronics')
+        ? 'TIF-ELEC'
+        : 'TIF-TRD';
       const hash = Math.floor(1000 + Math.random() * 9000);
       const code = `${prefix}-${hash}`;
       const entry: WaitlistEntry = {
@@ -58,7 +74,7 @@ export function WaitlistForm() {
       };
 
       try {
-        localStorage.setItem('eximora_waitlist_entry', JSON.stringify(entry));
+        localStorage.setItem('tiffora_waitlist_entry', JSON.stringify(entry));
         fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -83,6 +99,7 @@ export function WaitlistForm() {
 
   const handleReset = () => {
     try {
+      localStorage.removeItem('tiffora_waitlist_entry');
       localStorage.removeItem('eximora_waitlist_entry');
     } catch {
       // ignore
@@ -100,7 +117,7 @@ export function WaitlistForm() {
         </div>
 
         <div className="flex items-center justify-center gap-2 text-xs font-mono tracking-widest uppercase text-amber-700 dark:text-amber-300 font-semibold">
-          <span>Trade Registration Received</span>
+          <span>Interstate Registration Received</span>
         </div>
 
         <h3 className="text-xl font-serif text-slate-900 dark:text-white mt-1">Priority Desk Queued</h3>
@@ -153,16 +170,23 @@ export function WaitlistForm() {
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full max-w-2xl mx-auto">
       <form onSubmit={handleSubmit} className="space-y-3">
         {/* Trade participant selector */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 bg-slate-100 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 rounded-xl max-w-lg mx-auto mb-4">
-          {(['Overseas Buyer (Food)', 'Indian Retailer (Electronics)', 'Producer & Partner'] as const).map((cat) => (
+        <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 bg-slate-100 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 rounded-xl mx-auto mb-4">
+          {(
+            [
+              'State Agro Buyer (Food)',
+              'State Retailer (Electronics)',
+              'FPO & Mill Partner',
+              'Tiffy Early Access',
+            ] as const
+          ).map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setCategory(cat)}
-              className={`flex-1 min-w-[120px] py-1.5 px-2.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap text-center ${
+              className={`flex-1 min-w-[130px] py-1.5 px-2.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap shrink-0 text-center cursor-pointer ${
                 category === cat
                   ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-white/15'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent'

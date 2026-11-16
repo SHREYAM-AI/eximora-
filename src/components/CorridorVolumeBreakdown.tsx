@@ -49,7 +49,7 @@ export function CorridorVolumeBreakdown({
 }: CorridorVolumeBreakdownProps) {
   const [activeTab, setActiveTab] = useState<'donut' | 'commodities'>('donut');
 
-  // Colors aligned with Eximora's luxury bilateral palette
+  // Colors aligned with Tiffora's bilateral palette
   // Agro: Emerald / Jade tones
   // Electronics: Amber / Bronze / Gold tones
   const EXPORT_COLORS = ['#059669', '#10b981', '#34d399', '#047857'];
@@ -73,7 +73,7 @@ export function CorridorVolumeBreakdown({
 
     const bilateralShareData = [
       {
-        name: 'Food & Agro Exports',
+        name: 'State Agro Dispatch',
         corridor: 'export_agro' as const,
         orderCount: exportOrders.length,
         volume: exportVolumeTotal,
@@ -82,7 +82,7 @@ export function CorridorVolumeBreakdown({
         fill: '#059669',
       },
       {
-        name: 'Electronics Imports',
+        name: 'Electronics Supply',
         corridor: 'import_electronics' as const,
         orderCount: importOrders.length,
         volume: importVolumeTotal,
@@ -135,7 +135,7 @@ export function CorridorVolumeBreakdown({
       const categoryTotal = item.corridor === 'export_agro' ? exportOrders.length : importOrders.length;
       return {
         name: item.name,
-        category: item.corridor === 'export_agro' ? 'Food & Agro Export' : 'Electronics Import',
+        category: item.corridor === 'export_agro' ? 'State Agro Dispatch' : 'Electronics Supply',
         corridor: item.corridor,
         ordersCount: item.ordersCount,
         totalVolume: item.totalVolume,
@@ -177,7 +177,7 @@ export function CorridorVolumeBreakdown({
           </div>
           <div className="space-y-1 text-xs">
             <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
-              <span>Bilateral Share:</span>
+              <span>Interstate Share:</span>
               <span className="font-mono font-bold text-slate-900 dark:text-white">{data.sharePercent}%</span>
             </div>
             <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
@@ -207,10 +207,10 @@ export function CorridorVolumeBreakdown({
             <span>Corridor Volume Composition</span>
           </div>
           <h3 className="text-base sm:text-lg font-serif font-semibold text-slate-900 dark:text-white">
-            Bilateral Trade Volume Breakdown
+            Interstate Trade Volume Breakdown
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-            Proportional allocation between Indian agro exports and overseas electronics imports.
+            Proportional allocation between producer-state agro dispatches and metro-hub electronics supply.
           </p>
         </div>
 
@@ -225,7 +225,7 @@ export function CorridorVolumeBreakdown({
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Bilateral Ratio
+            Corridor Ratio
           </button>
           <button
             type="button"
@@ -246,7 +246,7 @@ export function CorridorVolumeBreakdown({
         {/* Left Column: Recharts Interactive Graphic (5 Cols) */}
         <div className="lg:col-span-5 p-5 rounded-xl bg-slate-50/80 dark:bg-black/30 border border-slate-200 dark:border-white/10 flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between text-xs font-mono pb-3 border-b border-slate-200 dark:border-white/5">
-            <span className="text-slate-500 dark:text-slate-400 uppercase font-medium">Bilateral Share Metric</span>
+            <span className="text-slate-500 dark:text-slate-400 uppercase font-medium">Interstate Share Metric</span>
             <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
               {stats.totalOrdersCount} Tracked Dockets
             </span>
@@ -358,7 +358,7 @@ export function CorridorVolumeBreakdown({
             >
               <div className="flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>Food Exports</span>
+                <span>State Agro</span>
               </div>
               <div className="mt-1 flex items-baseline justify-between text-[11px]">
                 <span className="text-slate-500 dark:text-slate-400">{stats.exportOrdersCount} Orders</span>
@@ -396,9 +396,9 @@ export function CorridorVolumeBreakdown({
                 <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-white/5">
                   <span className="text-emerald-700 dark:text-emerald-400 font-semibold uppercase flex items-center gap-1">
                     <Wheat className="w-3 h-3" />
-                    <span>Export Corridors</span>
+                    <span>Agro Dispatch Corridors</span>
                   </span>
-                  <span>India → Global Ports</span>
+                  <span>Producer States → Pan-India</span>
                 </div>
 
                 <div className="mt-3">
@@ -411,35 +411,35 @@ export function CorridorVolumeBreakdown({
 
                 <div className="mt-3 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500">Primary Hubs:</span>
-                    <span className="font-mono text-slate-800 dark:text-slate-200">Punjab, Gujarat, Haryana</span>
+                    <span className="text-slate-500">Producer Hubs:</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">Punjab, Gujarat, MP, AP</span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-slate-500">Quality Testing:</span>
-                    <span className="font-mono text-emerald-700 dark:text-emerald-400 font-medium">APEDA · FSSAI · Phyto</span>
+                    <span className="font-mono text-emerald-700 dark:text-emerald-400 font-medium">FSSAI · AGMARK · e-NAM</span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-slate-500">Key Commodities:</span>
-                    <span className="font-mono text-slate-800 dark:text-slate-200">Basmati, Spices, Pulses</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">Basmati, Cumin, Pulses</span>
                   </div>
                 </div>
               </div>
 
               <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-500">
-                <span>Asset-Light Farmer Co-op Allocations</span>
+                <span>Asset-Light State FPO Allocations</span>
                 <span className="text-emerald-700 dark:text-emerald-400 font-medium">Verified Pure</span>
               </div>
             </div>
 
-            {/* Import Corridor Deep-Dive Card */}
+            {/* Electronics Supply Corridor Deep-Dive Card */}
             <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 flex flex-col justify-between text-left shadow-xs">
               <div>
                 <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-white/5">
                   <span className="text-amber-800 dark:text-amber-300 font-semibold uppercase flex items-center gap-1">
                     <Cpu className="w-3 h-3" />
-                    <span>Import Corridors</span>
+                    <span>Electronics Supply Corridors</span>
                   </span>
-                  <span>World → Indian Hubs</span>
+                  <span>Metro Hubs → State Retail</span>
                 </div>
 
                 <div className="mt-3">
@@ -452,22 +452,22 @@ export function CorridorVolumeBreakdown({
 
                 <div className="mt-3 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500">Destination Ports:</span>
-                    <span className="font-mono text-slate-800 dark:text-slate-200">Nhava Sheva, Delhi ICD, Chennai</span>
+                    <span className="text-slate-500">Destination Hubs:</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">Mumbai, Bengaluru, Jaipur, Kolkata</span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-slate-500">Statutory Norms:</span>
-                    <span className="font-mono text-amber-800 dark:text-amber-300 font-medium">BIS CRS IS 13252 · RoHS</span>
+                    <span className="font-mono text-amber-800 dark:text-amber-300 font-medium">BIS CRS IS 13252 · LMPC</span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-slate-500">Target Channels:</span>
-                    <span className="font-mono text-slate-800 dark:text-slate-200">Wholesalers, E-Commerce, Retail</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">State Wholesalers, E-Commerce, Retail</span>
                   </div>
                 </div>
               </div>
 
               <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-500">
-                <span>Asset-Light OEM Sourcing Protocol</span>
+                <span>Asset-Light Metro Hub Protocol</span>
                 <span className="text-amber-800 dark:text-amber-300 font-medium">Direct Delivery</span>
               </div>
             </div>
@@ -480,8 +480,8 @@ export function CorridorVolumeBreakdown({
                 <CheckCircle2 className="w-4 h-4" />
               </div>
               <p className="text-slate-700 dark:text-slate-300 font-light">
-                <strong className="font-medium text-slate-900 dark:text-white font-serif">Bilateral Volume Balancing:</strong>{' '}
-                Eximora continuously counterbalances outgoing agro commodities with incoming tech accessories to optimize container freight logistics.
+                <strong className="font-medium text-slate-900 dark:text-white font-serif">Interstate Volume Balancing:</strong>{' '}
+                Tiffora counterbalances surplus-state agro dispatches with return-leg metro electronics runs to optimize highway container utilization.
               </p>
             </div>
 

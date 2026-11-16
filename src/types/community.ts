@@ -2,7 +2,7 @@ export type CommunityChannel = 'all' | 'export_agro' | 'import_electronics' | 'r
 
 export type PostType = 'buy_inquiry' | 'supply_offer' | 'market_insight' | 'regulatory_qa';
 
-export type UserRole = 'Overseas Buyer' | 'Indian Farmer Cooperative' | 'Indian Processor' | 'Indian Wholesaler' | 'Retail & Online Seller' | 'Trade Compliance Specialist';
+export type UserRole = 'Interstate Buyer' | 'State Farmer Cooperative (FPO)' | 'Regional Agro Processor' | 'State Wholesaler' | 'Retail & Online Seller' | 'GST & E-Way Specialist';
 
 export interface CommunityReply {
   id: string;
@@ -38,7 +38,7 @@ export interface CommunityPost {
     unit: string;
     origin: string;
     destination: string;
-    incoterm: 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
+    incoterm: 'FOR' | 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
   };
 }
 

@@ -31,7 +31,7 @@ interface TradeOrder {
   unit: string;
   origin: string;
   destination: string;
-  incoterm: 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
+  incoterm: 'FOR' | 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
   clientName: string;
   clientCompany: string;
   clientEmail: string;
@@ -113,7 +113,7 @@ interface CommunityPost {
     unit: string;
     origin: string;
     destination: string;
-    incoterm: 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
+    incoterm: 'FOR' | 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
   };
 }
 
@@ -173,26 +173,34 @@ async function startServer() {
   // Real-time Event Broadcaster (SSE + WebSockets)
   const sseClients = new Set<express.Response>();
 
-  // WebSocket Server with noServer to avoid collision with any HTTP/Vite listeners
-  const wss = new WebSocketServer({ noServer: true });
+  // WebSocket Server supporting both application channels and Vite dev client HMR
+  const wss = new WebSocketServer({
+    noServer: true,
+    handleProtocols: (protocols) => {
+      // Support vite-hmr or application protocols gracefully without handshake failure
+      return Array.from(protocols)[0] || false;
+    },
+  });
 
   server.on('upgrade', (request, socket, head) => {
     try {
-      const url = new URL(request.url || '', `http://${request.headers.host || 'localhost'}`);
-      if (url.pathname === '/api/ws') {
-        wss.handleUpgrade(request, socket, head, (ws) => {
-          wss.emit('connection', ws, request);
-        });
-      } else {
-        socket.destroy();
-      }
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+      });
     } catch {
-      socket.destroy();
+      try {
+        socket.destroy();
+      } catch {}
     }
   });
 
   wss.on('connection', (ws) => {
-    ws.send(JSON.stringify({ type: 'init', count: inMemoryOrders.length }));
+    try {
+      // Send Vite connected status to satisfy @vite/client and initialize application state
+      ws.send(JSON.stringify({ type: 'connected' }));
+      ws.send(JSON.stringify({ type: 'init', count: inMemoryOrders.length }));
+    } catch {}
+
     ws.on('message', (msg) => {
       try {
         const parsed = JSON.parse(msg.toString());
@@ -351,8 +359,8 @@ async function startServer() {
       const entry: WaitlistRegistration = {
         id: 'reg-' + Date.now(),
         email: email.trim().toLowerCase(),
-        category: category || 'Bilateral Trade Partner',
-        code: code || `EXM-TRD-${Math.floor(1000 + Math.random() * 9000)}`,
+        category: category || 'Interstate Trade Partner',
+        code: code || `TIF-TRD-${Math.floor(1000 + Math.random() * 9000)}`,
         joinedAt: now,
       };
 
@@ -430,8 +438,8 @@ async function startServer() {
         postType: postType || 'buy_inquiry',
         authorName,
         authorCompany: authorCompany || 'Commercial Trade Entity',
-        authorRole: authorRole || 'Buyer',
-        authorLocation: authorLocation || 'Global',
+        authorRole: authorRole || 'Interstate Buyer',
+        authorLocation: authorLocation || 'Maharashtra, India',
         isVerifiedPartner: false,
         content,
         commodityOrTopic: commodityOrTopic || title,
@@ -511,36 +519,37 @@ async function startServer() {
       if (!apiKey) {
         return res.json({
           brief: {
-            title: `Eximora Trade Intelligence: ${topic}`,
-            summary: `Regulatory and supply chain assessment for ${topic} across Eximora's bilateral corridors. Under our asset-light model, all transactions are sourced directly from verified cooperatives or certified manufacturing clusters with rigorous third-party lab inspection (APEDA, FSSAI, or BIS CRS).`,
+            title: `Tiffora Interstate Intelligence: ${topic}`,
+            summary: `Regulatory and supply chain assessment for ${topic} across Tiffora's Indian interstate corridors. Under our asset-light model, all transactions are sourced directly from certified FPOs or metro electronics hubs with rigorous third-party inspection (FSSAI Interstate, AGMARK, or BIS CRS) and automated NIC E-Way Bill / IGST compliance.`,
             keyTakeaways: [
-              'Verify mandatory pre-shipment lab certifications prior to container loading.',
-              'Ensure HSN classification matches customs tariff schedules to avoid port clearance demurrage.',
-              'Book maritime container allocations or air freight minimum 14 days in advance.',
-              'Implement desiccated packaging and vacuum sealing for deep sea moisture protection.',
+              'Verify mandatory pre-dispatch FSSAI / AGMARK or BIS CRS certificates prior to truck or rail loading.',
+              'Ensure HSN classification and IGST invoice match NIC E-Way Bill Part-A and Part-B schedules.',
+              'Book dedicated GPS-tracked express container trucks or CONCOR rail rakes in advance for peak harvest dispatches.',
+              'Implement moisture-barrier liner packaging and palletization for long-haul multi-state highway transit.',
             ],
-            operationalImpact: 'Eximora coordinates inspection, transit monitoring, and customs clearance without manufacturing markups.',
-            relevantStandards: ['APEDA', 'BIS CRS', 'FSSAI Export', 'ISO 22000'],
+            operationalImpact: 'Tiffora coordinates lab testing, interstate E-Way compliance, and line-haul transport without manufacturing overhead.',
+            relevantStandards: ['FSSAI Interstate', 'AGMARK', 'NIC E-Way Bill & IGST', 'BIS CRS IS 13252'],
           },
         });
       }
 
-      const prompt = `You are the Senior Trade Intelligence Officer for Eximora, a two-way trading house.
-Corridor 1: Export food products from Indian farmers and processors to overseas buyers.
-Corridor 2: Import electronic accessories for Indian wholesalers, retailers, and online sellers.
-Operating model: Asset-light trader (sources, certifies, ships, sells; does not manufacture).
+      const prompt = `You are the Senior Interstate Trade Intelligence Officer for Tiffora, a two-way interstate import-export trading house in India.
+Corridor 1 (State Agro Dispatch): Sourcing food products from farmers, FPOs, and processors in producer Indian states (e.g. Punjab, Haryana, Gujarat, MP, Andhra Pradesh) and supplying buyers in consumer states (e.g. Maharashtra, Karnataka, Delhi NCR, Tamil Nadu, West Bengal).
+Corridor 2 (Electronics Supply): Procuring high-demand electronic accessories from metro tech hubs (Delhi NCR/Noida, Mumbai/Bhiwandi, Chennai, Bengaluru) for state wholesalers, retailers, and online sellers across India.
+Upcoming Initiative: Tiffy (Coming Soon) — Tiffora's curated food brand backed by FSSAI, AGMARK, and direct state FPO provenance.
+Operating model: Asset-light interstate trader (sources, certifies, ships, sells; does not manufacture).
 
-Generate a concise, authoritative, professional bilateral trade intelligence brief for this topic:
+Generate a concise, authoritative, professional Indian interstate trade intelligence brief for this topic:
 "${topic}"
 Corridor context: ${corridor || 'bilateral'}
 
 Return a valid JSON object matching this schema:
 {
   "title": "Concise professional title",
-  "summary": "2-3 sentences executive summary explaining market dynamics, compliance, or logistics",
-  "keyTakeaways": ["Bullet 1 with exact standard or regulation", "Bullet 2 with operational guidance", "Bullet 3 with customs or freight advice", "Bullet 4 with risk mitigation"],
-  "operationalImpact": "1 sentence on how Eximora's asset-light sourcing and certification resolves this",
-  "relevantStandards": ["Standard 1 (e.g. APEDA, BIS CRS, FSSAI, CE)", "Standard 2"]
+  "summary": "2-3 sentences executive summary explaining interstate market dynamics, GST/E-Way compliance, or highway/rail logistics",
+  "keyTakeaways": ["Bullet 1 with exact Indian statutory standard (FSSAI, AGMARK, BIS CRS, LMPC)", "Bullet 2 with operational mandi/warehouse guidance", "Bullet 3 with E-Way Bill, IGST, or express truck/CONCOR rail advice", "Bullet 4 with transit risk mitigation"],
+  "operationalImpact": "1 sentence on how Tiffora's asset-light sourcing and certification resolves this across state borders",
+  "relevantStandards": ["Standard 1 (e.g. FSSAI Interstate, AGMARK, BIS CRS, NIC E-Way Bill, IGST)", "Standard 2"]
 }`;
 
       const aiCall = await ai.models.generateContent({
@@ -565,7 +574,7 @@ Return a valid JSON object matching this schema:
           keyTakeaways: parsed.keyTakeaways || [],
           operationalImpact: parsed.operationalImpact || '',
           relevantStandards: parsed.relevantStandards || [],
-          author: 'Exora AI Regulatory Desk',
+          author: 'Tiffora AI Interstate Compliance Desk',
         };
         inMemoryInsights.unshift(newInsight);
         return res.json({ brief: parsed });
@@ -576,15 +585,15 @@ Return a valid JSON object matching this schema:
       console.warn('AI brief fallback:', err.message);
       res.json({
         brief: {
-          title: `Trade Advisory: ${req.body.topic || 'Bilateral Trade Overview'}`,
-          summary: 'Eximora bridges Indian agricultural harvests with global buyers and routes high-turnover electronic accessories directly to Indian wholesale networks.',
+          title: `Interstate Trade Advisory: ${req.body.topic || 'State-to-State Corridor Overview'}`,
+          summary: 'Tiffora bridges Indian agricultural producer states with commercial buyers across India and distributes fast-moving electronic accessories from metro tech hubs to state wholesale networks.',
           keyTakeaways: [
-            'Mandatory certification audits (APEDA, FSSAI, BIS CRS) at origin.',
-            'Direct container stuffing and seal validation.',
-            'Structured Incoterms (FOB, CIF, DDP) to minimize counterparty risk.',
+            'Mandatory quality audits (FSSAI Interstate, AGMARK, BIS CRS) at origin state hubs.',
+            'Automated NIC E-Way Bill generation, IGST invoicing, and tamper-evident truck seals.',
+            'Structured interstate delivery terms (FOR, DDP, EXW) to eliminate transit risk.',
           ],
-          operationalImpact: 'Asset-light execution ensures high quality and verified provenance without manufacturing overhead.',
-          relevantStandards: ['APEDA', 'BIS CRS', 'FSSAI Export', 'ISO 22000'],
+          operationalImpact: 'Asset-light interstate execution ensures verified provenance and timely delivery without manufacturing overhead.',
+          relevantStandards: ['FSSAI Interstate', 'BIS CRS IS 13252', 'NIC E-Way Bill', 'AGMARK'],
         },
       });
     }
@@ -614,12 +623,12 @@ Return a valid JSON object matching this schema:
 
       if (apiKey && naturalLanguagePrompt) {
         try {
-          const prompt = `You are the AI Order Placement Engine for Eximora, a two-way trading company.
-Corridor 1: Export food products from Indian farmers and processors to overseas buyers.
-Corridor 2: Import electronic accessories for Indian wholesalers, retailers, and online sellers.
-Asset-light trader: Sourcing, certifying, shipping, selling.
+          const prompt = `You are the AI Order Placement Engine for Tiffora, a two-way interstate import-export trading company across Indian states.
+Corridor 1 (export_agro): Dispatching food products from farmers, FPOs, and processors in producer Indian states to commercial buyers in consumer Indian states.
+Corridor 2 (import_electronics): Procuring electronic accessories from metro tech hubs (Delhi NCR, Noida, Mumbai, Chennai, Bengaluru) for wholesalers, retailers, and online sellers across Indian states.
+Asset-light trader: Sourcing, certifying, shipping via express highway/CONCOR rail, selling.
 
-Parse the following customer order request into structured trade parameters:
+Parse the following interstate customer order request into structured trade parameters:
 "${naturalLanguagePrompt}"
 
 Return a valid JSON object matching this schema:
@@ -628,18 +637,18 @@ Return a valid JSON object matching this schema:
   "productName": "Concise product title",
   "productCategory": "Category description",
   "quantity": "Amount as string or number",
-  "unit": "Units, e.g. Metric Tons, Units, Cartons, Containers",
-  "origin": "Estimated origin port or region",
-  "destination": "Target delivery destination",
-  "incoterm": "FOB" | "CIF" | "CFR" | "DDP" | "EXW",
-  "certificationsRequired": ["List of relevant trade certificates, e.g. FSSAI, APEDA, Phytosanitary, BIS, CE, RoHS"],
-  "hsnCode": "Estimated 6 to 8 digit HSN code",
-  "targetPriceEstimate": "Estimated target price if mentioned or standard benchmark",
+  "unit": "Units, e.g. Metric Tons, Quintals, Units, Cartons, FTL Trucks",
+  "origin": "Origin Indian city & state (e.g. Ludhiana, Punjab or Noida, UP)",
+  "destination": "Destination Indian city & state (e.g. Bhiwandi, Maharashtra or Bengaluru, Karnataka)",
+  "incoterm": "FOR" | "DDP" | "EXW" | "CIF" | "FOB" | "CFR",
+  "certificationsRequired": ["List of Indian interstate certificates, e.g. FSSAI Interstate, AGMARK, NIC E-Way Bill, BIS CRS IS 13252, LMPC"],
+  "hsnCode": "Estimated 6 to 8 digit GST HSN code",
+  "targetPriceEstimate": "Estimated target price in INR if mentioned or standard benchmark",
   "aiAnalysis": {
-    "summary": "1-2 sentence commercial order summary",
+    "summary": "1-2 sentence commercial interstate order summary",
     "riskAssessment": "Low Risk" | "Standard" | "Elevated Compliance",
-    "assetLightAction": "Exact asset-light sourcing and verification plan",
-    "matchedNetwork": "Sourcing cluster recommendation"
+    "assetLightAction": "Exact asset-light sourcing, lab certification, and interstate dispatch plan",
+    "matchedNetwork": "State FPO / Metro Hub sourcing cluster recommendation"
   }
 }`;
 
@@ -671,40 +680,40 @@ Return a valid JSON object matching this schema:
         extractedData.corridor || corridor || (naturalLanguagePrompt?.toLowerCase().includes('electronic') || naturalLanguagePrompt?.toLowerCase().includes('charger') || naturalLanguagePrompt?.toLowerCase().includes('cable') ? 'import_electronics' : 'export_agro');
 
       const resolvedProductName =
-        extractedData.productName || productName || (resolvedCorridor === 'export_agro' ? 'Certified Organic Basmati Rice' : 'Fast Charging GaN USB-C Adapters');
+        extractedData.productName || productName || (resolvedCorridor === 'export_agro' ? 'Certified 1121 Steam Basmati Rice' : '65W GaN Fast Charging USB-C Adapters');
 
       const resolvedCategory =
-        extractedData.productCategory || (resolvedCorridor === 'export_agro' ? 'Food & Agricultural Commodities' : 'Consumer Electronic Accessories');
+        extractedData.productCategory || (resolvedCorridor === 'export_agro' ? 'Interstate Food & Agricultural Commodities' : 'Consumer Electronic Accessories');
 
       const resolvedQuantity = extractedData.quantity || quantity || '1';
       const resolvedUnit = extractedData.unit || unit || (resolvedCorridor === 'export_agro' ? 'Metric Tons' : 'Units');
-      const resolvedOrigin = extractedData.origin || origin || (resolvedCorridor === 'export_agro' ? 'India' : 'Global Tech Hub');
-      const resolvedDestination = extractedData.destination || destination || (resolvedCorridor === 'export_agro' ? 'Destination Port' : 'India Destination Port/ICD');
-      const resolvedIncoterm = (extractedData.incoterm || incoterm || (resolvedCorridor === 'export_agro' ? 'CIF' : 'DDP')) as 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
+      const resolvedOrigin = extractedData.origin || origin || (resolvedCorridor === 'export_agro' ? 'Ludhiana, Punjab' : 'Delhi NCR / Noida Hub');
+      const resolvedDestination = extractedData.destination || destination || (resolvedCorridor === 'export_agro' ? 'Mumbai / Bhiwandi, Maharashtra' : 'Bengaluru, Karnataka');
+      const resolvedIncoterm = (extractedData.incoterm || incoterm || (resolvedCorridor === 'export_agro' ? 'FOR' : 'DDP')) as 'FOR' | 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
 
-      const certs = extractedData.certificationsRequired || (resolvedCorridor === 'export_agro' ? ['APEDA Export Certification', 'Phytosanitary Inspection', 'FSSAI Lab Tested'] : ['BIS CRS Registration', 'CE Certified', 'RoHS Compliance']);
+      const certs = extractedData.certificationsRequired || (resolvedCorridor === 'export_agro' ? ['FSSAI Interstate License', 'AGMARK Grade A', 'NIC E-Way & IGST'] : ['BIS CRS IS 13252', 'Legal Metrology (LMPC)', 'IGST Tax Invoice']);
 
       const hsn = extractedData.hsnCode || (resolvedCorridor === 'export_agro' ? '1006.30.20' : '8504.40.90');
 
       const orderCount = inMemoryOrders.length + 1;
-      const orderPrefix = resolvedCorridor === 'export_agro' ? 'EXM-AGRO' : 'EXM-ELEC';
+      const orderPrefix = resolvedCorridor === 'export_agro' ? 'TIF-AGRO' : 'TIF-ELEC';
       const orderNumber = `${orderPrefix}-2026-${String(1000 + orderCount).slice(-4)}`;
       const now = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
       const isoNow = new Date().toISOString();
 
       const aiAnalysis = extractedData.aiQueryAnalysis || {
-        summary: `AI has registered the trade inquiry for ${resolvedQuantity} ${resolvedUnit} of ${resolvedProductName} under ${resolvedIncoterm} terms.`,
+        summary: `AI has registered the interstate inquiry for ${resolvedQuantity} ${resolvedUnit} of ${resolvedProductName} (${resolvedOrigin} → ${resolvedDestination}) under ${resolvedIncoterm} terms.`,
         riskAssessment: 'Low Risk' as const,
         assetLightAction: resolvedCorridor === 'export_agro'
-          ? 'Dispatching sourcing request to verified Indian farming cooperatives & APEDA accredited milling hubs.'
-          : 'Connecting to audited electronic component manufacturers with active BIS/CE test certificates.',
+          ? 'Dispatching sourcing allocation to verified state FPOs & FSSAI/AGMARK accredited milling hubs.'
+          : 'Connecting to audited metro electronics hubs with active BIS CRS & Legal Metrology compliance.',
         matchedNetwork: resolvedCorridor === 'export_agro'
-          ? 'Verified Indian Agricultural Producer Network'
-          : 'Accredited Electronics Manufacturing Hub',
+          ? 'Verified Interstate FPO & Agro Producer Network'
+          : 'Accredited Metro Tech Hub Distribution Network',
       };
 
       const resolvedPartyRole = (partyRole || 'vendor') as 'vendor' | 'buyer' | 'wholesaler' | 'processor';
-      const resolvedPartyRoleLabel = partyRoleLabel || (resolvedPartyRole === 'vendor' ? 'Verified Trade Vendor' : 'Trade Partner');
+      const resolvedPartyRoleLabel = partyRoleLabel || (resolvedPartyRole === 'vendor' ? 'Verified State Vendor' : 'Interstate Trade Partner');
 
       const newOrder: TradeOrder = {
         id: 'ord-' + Date.now(),
@@ -717,16 +726,16 @@ Return a valid JSON object matching this schema:
         origin: resolvedOrigin,
         destination: resolvedDestination,
         incoterm: resolvedIncoterm,
-        clientName: clientName || 'Authorized Vendor / Representative',
-        clientCompany: clientCompany || 'Vendor Commercial Enterprise',
-        clientEmail: clientEmail || 'vendor@enterprise.com',
+        clientName: clientName || 'Authorized Representative',
+        clientCompany: clientCompany || 'Interstate Commercial Enterprise',
+        clientEmail: clientEmail || 'trade@enterprise.in',
         partyRole: resolvedPartyRole,
         partyRoleLabel: resolvedPartyRoleLabel,
         placedAtIso: isoNow,
-        targetPriceEstimate: extractedData.targetPriceEstimate || 'Spot Trade Pricing upon Sourcing Allocation',
+        targetPriceEstimate: extractedData.targetPriceEstimate || 'Spot Mandi / Hub Rate upon Allocation',
         certificationsRequired: certs,
         hsnCode: hsn,
-        specialInstructions: specialInstructions || naturalLanguagePrompt || 'Standard commercial export/import compliance packaging.',
+        specialInstructions: specialInstructions || naturalLanguagePrompt || 'Standard interstate palletization with NIC E-Way Bill and IGST invoice.',
         stage: 'registered',
         progressPercent: 25,
         registeredAt: now,
@@ -738,39 +747,39 @@ Return a valid JSON object matching this schema:
             title: 'AI Order Query Registered & Parsed',
             timestamp: now,
             completed: true,
-            notes: `Trade query validated by Exora AI. Corridor: ${resolvedCorridor === 'export_agro' ? 'Export (India → Overseas)' : 'Import (Global → India)'}.`,
+            notes: `Interstate query validated by Tiffora AI. Corridor: ${resolvedCorridor === 'export_agro' ? 'State Agro Dispatch (Producer → Buyer State)' : 'Metro Tech Supply (Hub → State Retail)'}.`,
             category: 'query',
           },
           {
             id: 'm-reg-2',
-            title: 'Sourcing Allocation to Certified Producers',
+            title: 'Sourcing Allocation to State FPOs / Tech Hubs',
             timestamp: 'Queued for Execution',
             completed: false,
-            notes: 'Asset-light matching with pre-qualified agricultural processors or electronics manufacturers.',
+            notes: 'Asset-light matching with pre-qualified state agricultural processors or metro electronics hubs.',
             category: 'sourcing',
           },
           {
             id: 'm-reg-3',
-            title: 'Quality & Regulatory Certification Audit',
+            title: 'FSSAI / AGMARK / BIS CRS Quality Audit',
             timestamp: 'Pending Execution',
             completed: false,
-            notes: `Scheduled inspection: ${certs.join(', ')}.`,
+            notes: `Scheduled verification: ${certs.join(', ')}.`,
             category: 'certification',
           },
           {
             id: 'm-reg-4',
-            title: 'Freight Booking & Customs Dispatch',
+            title: 'NIC E-Way Bill & Interstate Fleet Dispatch',
             timestamp: 'Pending Execution',
             completed: false,
-            notes: 'Container slot allocation, bill of lading issuance, and customs compliance.',
+            notes: 'IGST invoice generation, E-Way Bill Part-B assignment, and GPS truck/CONCOR rail dispatch.',
             category: 'shipping',
           },
           {
             id: 'm-reg-5',
-            title: 'Destination Fulfillment & Proof of Delivery',
+            title: 'Destination State Fulfillment & POD',
             timestamp: 'Pending Fulfillment',
             completed: false,
-            notes: `Final release and delivery to ${resolvedDestination}.`,
+            notes: `Final warehouse unloading and Proof of Delivery at ${resolvedDestination}.`,
             category: 'delivery',
           },
         ],
@@ -815,22 +824,22 @@ Return a valid JSON object matching this schema:
         order.milestones[1].timestamp = now;
         order.milestones[1].notes =
           order.corridor === 'export_agro'
-            ? 'Matched with certified farmers cooperative. Harvest purity test approved.'
-            : 'Sourcing contract locked with certified electronics manufacturing partner. Batch QA verified.';
+            ? 'Matched with certified state farmer FPO. Harvest moisture & purity lab test approved.'
+            : 'Sourcing allocation locked with metro electronics distribution hub. BIS CRS batch QA verified.';
 
         order.milestones[2].completed = true;
         order.milestones[2].timestamp = now;
         order.milestones[2].notes = `Mandatory certification completed: ${order.certificationsRequired.slice(0, 2).join(' & ')} verified.`;
 
-        order.milestones[3].timestamp = 'In Transit / Manifest Active';
+        order.milestones[3].timestamp = 'In Transit / E-Way Active';
         order.milestones[3].completed = true;
-        order.milestones[3].notes = 'Export/Import clearance completed. Freight container dispatched.';
+        order.milestones[3].notes = 'IGST tax invoice & NIC E-Way Bill generated. Interstate carrier dispatched.';
 
         order.fulfillmentDoc = {
-          trackingNumber: `EXM-TRK-${Math.floor(100000 + Math.random() * 900000)}`,
-          vesselOrFlight: order.corridor === 'export_agro' ? 'Maersk Sea Corridor Voy 44B' : 'Singapore Airlines Cargo SQ-712',
-          inspectionPassId: `CERT-PASS-${Math.floor(1000 + Math.random() * 9000)}`,
-          fulfillmentStatus: 'In Execution - Vessel/Flight Dispatched',
+          trackingNumber: `EWB-${Math.floor(100000000 + Math.random() * 900000000)}`,
+          vesselOrFlight: order.corridor === 'export_agro' ? 'NH-48 Express Container Truck MH-04-EX-8821' : 'CONCOR Domestic Rail & Express Air Cargo',
+          inspectionPassId: `QC-PASS-${Math.floor(1000 + Math.random() * 9000)}`,
+          fulfillmentStatus: 'In Execution - Interstate Transit Active',
         };
       } else if (order.stage === 'execution') {
         // Move to Fulfilled
@@ -844,10 +853,10 @@ Return a valid JSON object matching this schema:
             m.timestamp = now;
           }
         });
-        order.milestones[4].notes = `Customs cleared at ${order.destination}. Commercial delivery signed by consignee.`;
+        order.milestones[4].notes = `Arrived at ${order.destination}. E-Way Bill closed & commercial Proof of Delivery signed.`;
 
         if (order.fulfillmentDoc) {
-          order.fulfillmentDoc.fulfillmentStatus = 'Fulfilled & Handed Over to Client';
+          order.fulfillmentDoc.fulfillmentStatus = 'Fulfilled & Handed Over to State Consignee';
         }
       }
 
@@ -865,24 +874,25 @@ Return a valid JSON object matching this schema:
     }
   });
 
-  // Exora AI Trade Concierge chat endpoint
+  // Tiffora AI Trade Concierge chat endpoint
   app.post('/api/chat', async (req, res) => {
     try {
       const { messages, userMessage } = req.body;
 
-      const systemInstruction = `You are Exora, the exclusive AI Trade Concierge for Eximora.
-About Eximora:
-- Eximora is a two-way cross-border trading company.
-- Export Corridor: Exports food and agricultural products from Indian farmers and certified processors to overseas buyers worldwide.
-- Import Corridor: Imports high-demand electronic accessories for Indian wholesalers, retailers, and online sellers.
-- Operating Model: An asset-light trader. Eximora does not manufacture; it sources, certifies, ships, and sells.
-- New Capability: Eximora has an AI-based Order Placement & Execution Tracking System. Clients can tell you or input their trade requirements (commodity, volume, ports, certifications), and Eximora's AI registers the query, routes it into execution (sourcing from certified farmers/manufacturers, certification audits, container freight), and tracks it through to final fulfillment.
+      const systemInstruction = `You are Tiffora AI, the exclusive AI Trade Concierge for Tiffora, an interstate import-export trading house operating across India.
+About Tiffora:
+- Tiffora is a two-way interstate trading company moving commercial goods across Indian state borders.
+- State Agro Dispatch Corridor (export_agro): Sources certified food and agricultural products from farmers, FPOs, and processors in surplus states (Punjab, Haryana, Gujarat, MP, Andhra Pradesh) and supplies commercial buyers in consumer states (Maharashtra, Karnataka, Tamil Nadu, Delhi NCR, West Bengal).
+- Metro Tech Supply Corridor (import_electronics): Procures high-demand electronic accessories from metro manufacturing & tech hubs (Delhi NCR/Noida, Mumbai/Bhiwandi, Chennai, Bengaluru) for state wholesalers, multi-brand retailers, and online sellers across Tier-1, Tier-2, and Tier-3 Indian states.
+- Tiffy (Coming Soon): Tiffora's upcoming consumer and bulk food initiative ("Tiffy — Fresh Food, Interstate Direct") built on direct state FPOs, FSSAI & AGMARK grading, and zero middlemen. Clients can join the Tiffy Early Access waitlist on the page.
+- Operating Model: An asset-light interstate trader. Tiffora does not manufacture; it sources, certifies, ships, and sells with full IGST, NIC E-Way Bill, FSSAI Interstate, AGMARK, and BIS CRS compliance.
+- Capability: Tiffora has an AI-based Order Placement & Execution Tracking System with QR-coded Interstate Dispatch Passes. Clients can specify commodity, volume, origin/destination states, and certifications, and Tiffora's AI registers the query, routes it into execution, and tracks highway/CONCOR rail transit through to fulfillment.
 
-Guidelines for Exora:
+Guidelines for Tiffora AI:
 - Tone: Highly articulate, refined, commercial, concise, and trustworthy.
 - Response Length: Keep answers concise (2 to 4 sentences usually, unless the user asks for deep operational detail).
-- Helpful Affordances: Clarify the bilateral corridors, explain how Eximora's "source, certify, ship, sell" model eliminates counterfeit and supply-chain risk, and guide interested clients to click "Place Order with AI" or track active orders on the page.
-- Integrity: Never claim that Eximora manufactures products. Always emphasize the asset-light sourcing and quality certification standard.`;
+- Helpful Affordances: Clarify the two-way interstate corridors, explain how Tiffora's "source, certify, ship, sell" model eliminates regional broker fragmentation and transit risk, highlight Tiffy (Coming Soon) early access when asked, and guide interested clients to click "Place Order with AI" or track active orders on the page.
+- Integrity: Never claim that Tiffora manufactures products. Always emphasize asset-light interstate sourcing, quality certification, and E-Way/IGST compliance.`;
 
       const contents = [];
 
@@ -904,7 +914,7 @@ Guidelines for Exora:
 
       if (!apiKey) {
         return res.json({
-          reply: "Welcome to Eximora. I am Exora, your bilateral trade concierge. Eximora is an asset-light, two-way trading house: we export quality food products from Indian farmers and processors to overseas buyers, and import high-turnover electronic accessories for Indian retailers and online sellers. We source, certify, ship, and sell. You can now also place trade orders directly through our AI order placement system, where we register your query, move it into execution, and fulfill it seamlessly. How may I assist your trade requirements today?",
+          reply: "Welcome to Tiffora. I am Tiffora AI, your interstate trade concierge. Tiffora is an asset-light, two-way interstate trading house across India: we dispatch quality food products from farmers and FPOs in surplus states to buyers across consumer states, supply high-turnover electronic accessories from metro hubs to regional wholesalers, and are preparing to launch Tiffy (Coming Soon) — our direct interstate food brand. You can place orders directly through our AI Order Placement system or join Tiffy Early Access below.",
         });
       }
 
@@ -917,12 +927,12 @@ Guidelines for Exora:
         },
       });
 
-      const reply = response.text || "I am pleased to assist you with Eximora's trade operations. How may I direct your inquiry?";
+      const reply = response.text || "I am pleased to assist you with Tiffora's interstate trade operations across India, including our upcoming Tiffy food initiative. How may I direct your inquiry?";
       res.json({ reply });
     } catch (error: any) {
-      console.error('Error in Exora chat endpoint:', error);
+      console.error('Error in Tiffora AI chat endpoint:', error);
       res.json({
-        reply: "Greetings from Eximora. I am Exora, your AI trade concierge. Eximora bridges global markets by exporting Indian food products overseas and importing electronic accessories for Indian retailers. We source, certify, ship, and sell without manufacturing. You can register your query via our AI Order Placement system to begin sourcing, certification, and fulfillment.",
+        reply: "Greetings from Tiffora. I am Tiffora AI, your trade concierge. Tiffora bridges Indian state markets by dispatching certified agricultural produce from farmer states, supplying electronic accessories from metro hubs, and launching Tiffy (Coming Soon) for direct interstate food distribution. Register your query via our AI Order Placement system or join Tiffy Early Access on the page.",
       });
     }
   });
@@ -953,7 +963,7 @@ Guidelines for Exora:
     console.log(`\n  VITE ready in full-stack mode\n`);
     console.log(`  ➜  Local:   http://localhost:${port}/`);
     console.log(`  ➜  Network: http://0.0.0.0:${port}/`);
-    console.log(`  ➜  Eximora full-stack trading server running\n`);
+    console.log(`  ➜  Tiffora full-stack trading server running\n`);
   });
 
   // Graceful shutdown on restart or termination

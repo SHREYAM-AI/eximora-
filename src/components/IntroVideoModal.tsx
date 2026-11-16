@@ -45,79 +45,79 @@ interface VideoChapter {
 const CHAPTERS: VideoChapter[] = [
   {
     id: 'ch-vision',
-    title: 'The Bilateral Vision',
+    title: 'The Interstate Vision',
     startTime: 0,
     endTime: 22,
-    corridorBadge: 'Bilateral Trade Model',
+    corridorBadge: 'Interstate Trade Model',
     corridorType: 'general',
     imageSrc: '/src/assets/images/video_intro_poster_1794159305622.jpg',
-    headline: 'Precision Cross-Border Commerce Without Industrial Inertia',
-    subheadline: 'Eximora is a bilateral, asset-light trading house bridging Indian commodities with global tech supply chains.',
+    headline: 'Precision Interstate Commerce Without Industrial Inertia',
+    subheadline: 'Tiffora is a two-way, asset-light interstate trading house bridging Indian producer states with metro tech retail hubs.',
     narration:
-      'Welcome to Eximora. We are a specialized two-way trading house designed for modern international commerce. Rather than burdened by manufacturing overhead, we operate an agile, asset-light bilateral network: exporting India’s finest agricultural products globally, and importing high-demand electronic accessories directly for Indian businesses.',
+      'Welcome to Tiffora. We are a specialized two-way interstate trading house built for modern commerce across Indian states. Rather than carrying heavy manufacturing or warehouse overhead, we operate an agile network: dispatching agricultural surplus from producer states nationwide, and supplying certified electronic accessories from metro tech hubs to state retailers.',
     metrics: [
-      { label: 'Operating Corridors', value: '2 Bilateral' },
+      { label: 'Operating Corridors', value: '2 Interstate' },
       { label: 'Asset Structure', value: 'Asset-Light' },
       { label: 'Core Philosophy', value: 'Source · Certify · Ship · Sell' },
     ],
-    tags: ['Cross-Border Trading', 'Asset-Light', 'Two-Way Trade'],
+    tags: ['Interstate Trading', 'Asset-Light', 'Pan-India Corridors'],
   },
   {
     id: 'ch-agro-export',
-    title: 'Food & Agro Exports',
+    title: 'State Agro Dispatch',
     startTime: 22,
     endTime: 45,
-    corridorBadge: 'Export Corridor · India → World',
+    corridorBadge: 'State Agro Corridor · Producer → Buyer States',
     corridorType: 'export_agro',
     imageSrc: '/src/assets/images/video_scene_agro_export_1794159306274.jpg',
-    headline: 'Connecting Certified Indian Farmers with Overseas Buyers',
-    subheadline: 'From Punjab to Rotterdam: Premium Basmati rice, organic spices, and pulses sourced directly from certified farmer cooperatives.',
+    headline: 'Connecting State Farmer Cooperatives with Pan-India Buyers',
+    subheadline: 'From Punjab to Bhiwandi & Bengaluru: Premium Basmati rice, Unjha cumin, and pulses sourced directly from certified FPOs.',
     narration:
-      'In our export corridor, Eximora sources premium food and agro products from certified Indian farming cooperatives and state-of-the-art processing hubs in Punjab, Haryana, and Gujarat. Every shipment is rigorously verified under APEDA and FSSAI standards, ensuring absolute phytosanitary purity for international food importers and distributors.',
+      'In our agro dispatch corridor, Tiffora sources graded food and agricultural commodities directly from certified farmer cooperatives and modern dry millers in Punjab, Gujarat, Madhya Pradesh, and Andhra Pradesh. Every load is verified under FSSAI Interstate and AGMARK norms with automated NIC E-Way Bills for rapid state-to-state highway and rail fulfillment.',
     metrics: [
-      { label: 'Key Commodities', value: 'Basmati Rice, Spices, Pulses' },
-      { label: 'Statutory Standards', value: 'APEDA · FSSAI · Phytosanitary' },
-      { label: 'Primary Markets', value: 'Middle East, Europe, ASEAN' },
+      { label: 'Key Commodities', value: 'Basmati Rice, Cumin, Pulses' },
+      { label: 'Statutory Standards', value: 'FSSAI · AGMARK · E-Way Bill' },
+      { label: 'Buyer Markets', value: 'Maharashtra, Karnataka, TN, WB' },
     ],
-    tags: ['Basmati Rice', 'Organic Spices', 'APEDA Accredited', 'Bulk Container Freight'],
+    tags: ['State Agro Dispatch', 'FSSAI & AGMARK', 'FPO Direct', 'E-Way & IGST'],
   },
   {
     id: 'ch-electronics-import',
-    title: 'Electronics Accessories Import',
+    title: 'Electronics Supply Corridor',
     startTime: 45,
     endTime: 68,
-    corridorBadge: 'Import Corridor · World → India',
+    corridorBadge: 'Electronics Supply · Metro Hubs → Pan-India',
     corridorType: 'import_electronics',
     imageSrc: '/src/assets/images/video_scene_electronics_import_1794159307584.jpg',
-    headline: 'High-Demand Tech Accessories for Indian Retail & E-Commerce',
-    subheadline: 'Procuring high-turnover consumer electronics directly from top manufacturing clusters with full BIS CRS compliance.',
+    headline: 'High-Demand Tech Accessories for State Retail & E-Commerce',
+    subheadline: 'Procuring fast-moving consumer electronics from Delhi NCR, Chennai, and Mumbai hubs with full BIS CRS & LMPC compliance.',
     narration:
-      'In our import corridor, Eximora procures high-velocity electronic accessories—from Gallium Nitride fast wall chargers to braided 100W Power Delivery cables and audio peripherals. We handle end-to-end statutory testing, ensuring full BIS CRS IS 13252 and RoHS compliance so Indian wholesalers and e-commerce sellers can retail with zero customs friction.',
+      'In our return corridor, Tiffora supplies high-velocity electronic accessories—from Gallium Nitride fast wall chargers to braided 100W Power Delivery cables and audio peripherals—from metro hubs to state wholesalers and online sellers. Every batch carries verified BIS CRS IS 13252 safety certification, Legal Metrology LMPC MRP labeling, and clean IGST tax invoicing.',
     metrics: [
       { label: 'Target Products', value: 'GaN Chargers, PD Cables, Audio' },
-      { label: 'Compliance Standards', value: 'BIS CRS IS 13252 · RoHS 2.0' },
-      { label: 'Distribution Channels', value: 'Wholesale, Retail, E-Commerce' },
+      { label: 'Compliance Standards', value: 'BIS CRS IS 13252 · LMPC' },
+      { label: 'Distribution Reach', value: 'Pan-India Tier-1/2/3' },
     ],
-    tags: ['GaN Chargers', 'Type-C PD Cables', 'BIS CRS Compliance', 'B2B Wholesale'],
+    tags: ['GaN Chargers', 'Type-C PD Cables', 'BIS CRS & LMPC', 'State Retail'],
   },
   {
     id: 'ch-four-pillars',
     title: 'The Four Operating Pillars',
     startTime: 68,
     endTime: 90,
-    corridorBadge: 'Operational Execution',
+    corridorBadge: 'Four Operating Pillars',
     corridorType: 'general',
     imageSrc: '/src/assets/images/video_scene_trading_desk_1794159307086.jpg',
     headline: 'Source · Certify · Ship · Sell',
-    subheadline: 'Zero inventory entrapment. Real-time AI docket placement and transparent multimodal logistics tracking.',
+    subheadline: 'Zero inventory entrapment. Real-time AI docket placement, unique QR E-Way pass verification, and multimodal road/rail tracking.',
     narration:
-      'Our operational model rests on four decisive pillars: We Source verified goods directly, Certify them under strict statutory norms, Ship them via integrated container routes, and Sell them to qualified counter-parties. With our AI order placement desk, vendors and buyers can execute cross-border inquiries in minutes.',
+      'Our operational model rests on four decisive pillars: We Source verified goods from surplus states and metro hubs, Certify every batch under FSSAI, BIS, and IGST rules, Ship via express container trucks and CONCOR rail corridors, and Sell directly to verified state counterparties. With AI order placement and scannable QR dispatch passes, interstate trade executes in minutes.',
     metrics: [
       { label: 'Four Pillars', value: 'Source · Certify · Ship · Sell' },
-      { label: 'Order Execution', value: 'Real-Time AI Intake' },
+      { label: 'Order Execution', value: 'AI Desk + QR E-Way Pass' },
       { label: 'Inventory Risk', value: 'Zero Manufacturing Overhead' },
     ],
-    tags: ['Source', 'Certify', 'Ship', 'Sell', 'AI Order Desk'],
+    tags: ['Source', 'Certify', 'Ship', 'Sell', 'QR E-Way Pass'],
   },
 ];
 
@@ -303,7 +303,7 @@ export function IntroVideoModal({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Eximora Introduction Video"
+      aria-label="Tiffora Introduction Video"
       className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-xl transition-opacity animate-in fade-in duration-200"
     >
       {/* Backdrop click to close */}
@@ -318,12 +318,12 @@ export function IntroVideoModal({
         <div className="px-4 sm:px-6 py-3.5 bg-black/60 border-b border-white/10 flex items-center justify-between gap-4 shrink-0 backdrop-blur-md">
           <div className="flex items-center gap-3 truncate">
             <div className="w-6 h-6 rounded-md bg-amber-400/10 border border-amber-400/30 flex items-center justify-center font-serif text-xs font-bold text-amber-300 shrink-0">
-              E
+              T
             </div>
             <div className="truncate">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-brand tracking-widest uppercase font-bold text-white">
-                  Eximora Overview
+                  Tiffora Overview
                 </span>
                 <span className="text-white/20">/</span>
                 <span className="text-xs font-mono text-amber-300/90 truncate">

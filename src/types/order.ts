@@ -21,7 +21,7 @@ export interface TradeOrder {
   unit: string;
   origin: string;
   destination: string;
-  incoterm: 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
+  incoterm: 'FOR' | 'FOB' | 'CIF' | 'CFR' | 'DDP' | 'EXW';
   clientName: string;
   clientCompany: string;
   clientEmail: string;

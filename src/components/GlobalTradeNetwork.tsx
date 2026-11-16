@@ -1,22 +1,14 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import * as d3 from 'd3';
 import {
-  Globe,
   Wheat,
   Cpu,
-  Layers,
-  MapPin,
   ArrowRight,
-  ShieldCheck,
-  Clock,
-  Anchor,
   Compass,
   Sparkles,
-  ChevronRight,
   Radio,
   CheckCircle2,
-  Maximize2,
-  RotateCcw,
+  Truck,
 } from 'lucide-react';
 import { TradeCorridor } from '../types/order';
 
@@ -27,16 +19,16 @@ interface GlobalTradeNetworkProps {
 export interface TradeHub {
   id: string;
   name: string;
-  country: string;
+  state: string;
   region: string;
-  portName: string;
-  portCode: string;
+  terminalName: string;
+  hubCode: string;
   coordinates: [number, number]; // [longitude, latitude]
-  type: 'headquarters' | 'agro_export' | 'electronics_import' | 'european_terminal';
+  type: 'headquarters' | 'agro_export' | 'electronics_import';
   corridorRole: string;
   primaryCommodities: string[];
   certifications: string[];
-  transitTimes: { destination: string; seaDays: string; airHours?: string }[];
+  transitTimes: { destination: string; transitDays: string; mode?: string }[];
   description: string;
 }
 
@@ -48,221 +40,292 @@ export interface TradeRoute {
   corridorType: 'export_agro' | 'import_electronics' | 'bilateral';
   color: string;
   commodities: string;
-  distanceNauticalMiles: number;
+  distanceKm: number;
   avgTransitDays: string;
-  incoterms: string[];
+  terms: string[];
   standards: string[];
 }
 
 export const HUBS: TradeHub[] = [
   {
-    id: 'hub-india',
-    name: 'Mumbai / JNPT & Mundra',
-    country: 'India',
-    region: 'South Asia',
-    portName: 'Jawaharlal Nehru Port (JNPT) & Port of Mundra',
-    portCode: 'INNSA / INMUN',
-    coordinates: [72.8777, 18.9712],
+    id: 'hub-delhi',
+    name: 'Delhi NCR (Okhla & Kundli)',
+    state: 'Delhi / Haryana',
+    region: 'Northern India',
+    terminalName: 'Tughlakabad ICD & Kundli Agro-Tech Park',
+    hubCode: 'DL-NCR-HUB',
+    coordinates: [77.209, 28.6139],
     type: 'headquarters',
-    corridorRole: 'Bilateral Headquarters & Sourcing Epicenter',
+    corridorRole: 'Northern Bilateral HQ & Electronics Distribution Anchor',
     primaryCommodities: [
-      '1121 & Pusa Basmati Rice',
-      'Organic Turmeric & Cumin',
-      'High-Power GaN Chargers (Import)',
-      '100W PD Cables (Import)',
-    ],
-    certifications: ['APEDA Accredited', 'FSSAI Export License', 'BIS CRS IS 13252', 'Phytosanitary'],
-    transitTimes: [
-      { destination: 'Dubai (Jebel Ali)', seaDays: '4–6 Days', airHours: '3.5 Hours' },
-      { destination: 'Singapore', seaDays: '5–7 Days', airHours: '5.5 Hours' },
-      { destination: 'Rotterdam', seaDays: '22–26 Days', airHours: '10 Hours' },
-    ],
-    description:
-      'The central coordination nerve center for Eximora’s bilateral operations. Directly links certified agricultural farming cooperatives in Punjab, Gujarat, and Haryana with international markets, while distributing imported electronics to Indian wholesale and retail channels.',
-  },
-  {
-    id: 'hub-dubai',
-    name: 'Dubai / Jebel Ali',
-    country: 'United Arab Emirates',
-    region: 'Middle East & GCC',
-    portName: 'Port of Jebel Ali Terminal',
-    portCode: 'AEJEA',
-    coordinates: [55.0273, 24.9857],
-    type: 'agro_export',
-    corridorRole: 'GCC Food Distribution & Bulk Agro Gateway',
-    primaryCommodities: [
-      'Sortex Cleaned Basmati Rice',
-      'Organic Culinary Spices',
-      'Lentils & Agro Seeds',
-    ],
-    certifications: ['APEDA TraceNet', 'Dubai Municipality Food Safety', 'ESMA Conformity', 'Halal QA'],
-    transitTimes: [
-      { destination: 'Mumbai (JNPT)', seaDays: '4–6 Days' },
-      { destination: 'Rotterdam', seaDays: '16–19 Days' },
-    ],
-    description:
-      'Premier commercial trading crossroad for Middle Eastern food security. Receives containerized food products shipped under CIF Jebel Ali terms for re-distribution across UAE, Saudi Arabia, Oman, and regional hypermarket chains.',
-  },
-  {
-    id: 'hub-singapore',
-    name: 'Singapore',
-    country: 'Singapore',
-    region: 'Southeast Asia',
-    portName: 'Port of Singapore (PSA) & Jurong Logistics Hub',
-    portCode: 'SGSIN',
-    coordinates: [103.8198, 1.3521],
-    type: 'electronics_import',
-    corridorRole: 'High-Demand Consumer Electronics Consolidation Hub',
-    primaryCommodities: [
-      'GaN 65W/100W Wall Adapters',
+      '65W / 100W GaN Dual Chargers',
       'Braided Type-C PD Cables',
-      'TWS Earphones & Audio Peripherals',
+      '1121 Steam Basmati Rice',
+      'TWS Audio & Power Banks',
     ],
-    certifications: ['BIS CRS IS 13252 (Part 1)', 'RoHS 2.0 Compliant', 'CE EMC/LVD', 'IEC 62368-1'],
+    certifications: ['NIC E-Way & IGST', 'BIS CRS IS 13252', 'FSSAI Interstate', 'LMPC Verified'],
     transitTimes: [
-      { destination: 'Mumbai (Nhava Sheva)', seaDays: '5–7 Days', airHours: '5 Hours' },
-      { destination: 'Dubai', seaDays: '9–12 Days' },
+      { destination: 'Mumbai / Bhiwandi', transitDays: '2 Days (NH-48 / DFC)' },
+      { destination: 'Ludhiana', transitDays: '6–8 Hours (Express Truck)' },
+      { destination: 'Bengaluru', transitDays: '3–4 Days (CONCOR Rail)' },
     ],
     description:
-      'Leading Asian tech procurement anchor. Coordinates verified electronics suppliers, batch laboratory safety assays under Indian BIS standards, and container stuffing for immediate delivery to Indian wholesale distributors.',
+      'Tiffora’s northern command hub linking NCR electronics assembly clusters in Noida and Gurugram with Tier-1/2 state wholesalers, while aggregating grain dispatches from Haryana and Punjab.',
   },
   {
-    id: 'hub-rotterdam',
-    name: 'Rotterdam',
-    country: 'Netherlands',
-    region: 'Western Europe',
-    portName: 'Port of Rotterdam (Maasvlakte Gateway)',
-    portCode: 'NLRTM',
-    coordinates: [4.4777, 51.9244],
-    type: 'european_terminal',
-    corridorRole: 'European Continental Agricultural Terminal',
+    id: 'hub-ludhiana',
+    name: 'Ludhiana / Amritsar',
+    state: 'Punjab',
+    region: 'Northern Grain Belt',
+    terminalName: 'Ludhiana Multi-Modal Logistics Park (MMLP)',
+    hubCode: 'PB-LDH-AGRO',
+    coordinates: [75.8573, 30.901],
+    type: 'agro_export',
+    corridorRole: 'Premier Basmati Rice & Grain Sourcing Epicenter',
     primaryCommodities: [
-      'High-Curcumin Organic Turmeric',
-      'Pesticide-Free Spices',
-      'Non-GMO Agricultural Produce',
+      '1121 Extra Long Basmati Rice',
+      'Sortex Wheat & Pulses',
+      'Cold-Pressed Mustard Oil',
     ],
-    certifications: ['EU MRL Regulation (EC) 396/2005', 'FSSAI Export Standard', 'GlobalGAP', 'Eurofins Lab Tested'],
+    certifications: ['AGMARK Grade-A', 'FSSAI Central License', 'e-NAM APMC Verified', 'ISO 22000'],
     transitTimes: [
-      { destination: 'Mumbai (JNPT)', seaDays: '22–26 Days' },
-      { destination: 'Dubai', seaDays: '16–19 Days' },
+      { destination: 'Delhi NCR', transitDays: '6–8 Hours' },
+      { destination: 'Mumbai / Bhiwandi', transitDays: '2–3 Days' },
+      { destination: 'Bengaluru', transitDays: '3–4 Days' },
     ],
     description:
-      'Europe’s largest deep-sea port terminal. Fulfills strict European agricultural and phytosanitary import contracts with zero residue tolerance, receiving temperature-monitored container consignments from certified Indian growers.',
+      'Direct farm-gate procurement anchor connecting verified Punjab & Haryana farmer producer organizations (FPOs) and sortex rice mills with institutional food buyers across Maharashtra, Karnataka, and Tamil Nadu.',
+  },
+  {
+    id: 'hub-ahmedabad',
+    name: 'Ahmedabad / Unjha',
+    state: 'Gujarat',
+    region: 'Western Agro & Spice Belt',
+    terminalName: 'Sanand-Unjha Spice & Commodity Exchange Hub',
+    hubCode: 'GJ-AMD-AGRO',
+    coordinates: [72.5714, 23.0225],
+    type: 'agro_export',
+    corridorRole: 'Spice, Cumin, Oilseeds & Dry Commodity Dispatch Hub',
+    primaryCommodities: [
+      'Unjha Jeera (Cumin Seeds)',
+      'Organic Turmeric & Coriander',
+      'Groundnut & Sesame Oilseeds',
+    ],
+    certifications: ['Spices Board India QA', 'FSSAI Interstate', 'AGMARK Pure', 'NIC E-Way Cleared'],
+    transitTimes: [
+      { destination: 'Mumbai / Bhiwandi', transitDays: '1 Day (NH-48 Overnight)' },
+      { destination: 'Chennai', transitDays: '3 Days' },
+    ],
+    description:
+      'Western India’s flagship agricultural sourcing corridor centered around Unjha and Ahmedabad. Delivers moisture-tested spices, oilseeds, and pulses across Indian state borders with full IGST invoicing.',
+  },
+  {
+    id: 'hub-mumbai',
+    name: 'Mumbai / Bhiwandi',
+    state: 'Maharashtra',
+    region: 'Western Commerce',
+    terminalName: 'Bhiwandi Interstate Fulfillment & Freight Park',
+    hubCode: 'MH-BWD-HUB',
+    coordinates: [73.0631, 19.2813],
+    type: 'headquarters',
+    corridorRole: 'Western Commercial Gateway & E-Commerce Redistribution',
+    primaryCommodities: [
+      'Retail & E-Commerce Electronics',
+      'High-Volume Agro Consumer Lots',
+      '100W PD Cables & MagSafe Docks',
+    ],
+    certifications: ['BIS CRS Verified', 'Legal Metrology (LMPC)', 'FSSAI State & Central', 'IGST B2B'],
+    transitTimes: [
+      { destination: 'Ahmedabad', transitDays: '1 Day' },
+      { destination: 'Bengaluru', transitDays: '1–2 Days (NH-48)' },
+      { destination: 'Delhi NCR', transitDays: '2 Days (Western DFC)' },
+    ],
+    description:
+      'Western India’s high-velocity commercial nerve center. Counterbalances incoming Basmati and spice rail/truck lots from Punjab and Gujarat with outbound electronic accessories for state retail chains.',
+  },
+  {
+    id: 'hub-bengaluru',
+    name: 'Bengaluru',
+    state: 'Karnataka',
+    region: 'Southern Tech & Retail',
+    terminalName: 'Nelamangala & Whitefield Tech Logistics Park',
+    hubCode: 'KA-BLR-HUB',
+    coordinates: [77.5946, 12.9716],
+    type: 'electronics_import',
+    corridorRole: 'Southern Tech Accessory & Agro Buyer Destination',
+    primaryCommodities: [
+      'GaN Fast Chargers & Power Banks',
+      'TWS Audio & Laptop Docks',
+      'Wholesale Basmati & Spices',
+    ],
+    certifications: ['BIS CRS IS 13252', 'RoHS 2.0 Compliant', 'FSSAI Buyer Audit', 'E-Way Part-B'],
+    transitTimes: [
+      { destination: 'Chennai', transitDays: '6–7 Hours (Expressway)' },
+      { destination: 'Mumbai / Bhiwandi', transitDays: '1–2 Days' },
+    ],
+    description:
+      'Receives multi-state food consignments for Southern institutional buyers and supermarkets, while distributing BIS-certified mobile & laptop accessories to regional retailers across Karnataka and Kerala.',
+  },
+  {
+    id: 'hub-chennai',
+    name: 'Chennai / Sriperumbudur',
+    state: 'Tamil Nadu',
+    region: 'Southern Electronics Corridor',
+    terminalName: 'Sriperumbudur Electronics Manufacturing & Freight Cluster',
+    hubCode: 'TN-MAA-TECH',
+    coordinates: [80.2707, 13.0827],
+    type: 'electronics_import',
+    corridorRole: 'Southern Electronics Sourcing & State Wholesale Anchor',
+    primaryCommodities: [
+      'Made-in-India GaN Chargers',
+      'Braided USB-C Cables & Adapters',
+      'Audio Wearables & Peripherals',
+    ],
+    certifications: ['BIS CRS Registered', 'LMPC Retail Pack Ready', 'ISO 9001 Hub QA', 'IGST Compliant'],
+    transitTimes: [
+      { destination: 'Bengaluru', transitDays: '6–7 Hours' },
+      { destination: 'Mumbai / Bhiwandi', transitDays: '2–3 Days' },
+      { destination: 'Delhi NCR', transitDays: '3–4 Days (Express Rail)' },
+    ],
+    description:
+      'Anchor southern sourcing hub in Tamil Nadu’s premier electronics corridor. Connects verified OEM accessory lots directly with state wholesalers and marketplace sellers across India.',
   },
 ];
 
 export const ROUTES: TradeRoute[] = [
   {
-    id: 'route-in-dxb',
-    name: 'India ⇄ Dubai Agro Express',
-    originHubId: 'hub-india',
-    destHubId: 'hub-dubai',
+    id: 'route-pb-mh',
+    name: 'Punjab ⇄ Maharashtra Agro Expressway',
+    originHubId: 'hub-ludhiana',
+    destHubId: 'hub-mumbai',
     corridorType: 'export_agro',
-    color: '#059669', // Emerald
-    commodities: 'Basmati Rice, Organic Spices & Oilseeds',
-    distanceNauticalMiles: 1060,
-    avgTransitDays: '4–6 Days',
-    incoterms: ['CIF Jebel Ali', 'FOB Mundra', 'CFR'],
-    standards: ['APEDA TraceNet', 'Phytosanitary', 'FSSAI Export'],
+    color: '#059669',
+    commodities: '1121 Basmati Rice, Wheat, Mustard Oil & Pulses',
+    distanceKm: 1620,
+    avgTransitDays: '2–3 Days',
+    terms: ['FOR Ludhiana', 'DDP Bhiwandi', 'EXW Mandi'],
+    standards: ['FSSAI Interstate', 'AGMARK Grade A', 'NIC E-Way Bill'],
   },
   {
-    id: 'route-sg-in',
-    name: 'Singapore ⇄ India Tech Bridge',
-    originHubId: 'hub-singapore',
-    destHubId: 'hub-india',
+    id: 'route-dl-blr',
+    name: 'Delhi NCR ⇄ Bengaluru Tech & Agro Bridge',
+    originHubId: 'hub-delhi',
+    destHubId: 'hub-bengaluru',
     corridorType: 'import_electronics',
-    color: '#d97706', // Amber
-    commodities: 'GaN Dual Chargers, 100W PD Cables, Audio Gear',
-    distanceNauticalMiles: 2150,
-    avgTransitDays: '5–7 Days',
-    incoterms: ['DDP Delhi ICD', 'CIF Nhava Sheva', 'EXW'],
-    standards: ['BIS CRS IS 13252', 'RoHS 2.0', 'IS 1293'],
+    color: '#d97706',
+    commodities: 'GaN 65W Chargers, PD Cables, TWS Audio Peripherals',
+    distanceKm: 2150,
+    avgTransitDays: '3–4 Days',
+    terms: ['DDP Bengaluru', 'FOR Okhla', 'EXW Noida'],
+    standards: ['BIS CRS IS 13252', 'LMPC MRP Ready', 'IGST Tax Invoice'],
   },
   {
-    id: 'route-in-rtm',
-    name: 'India ⇄ Rotterdam Maritime Corridor',
-    originHubId: 'hub-india',
-    destHubId: 'hub-rotterdam',
+    id: 'route-gj-mh',
+    name: 'Gujarat ⇄ Maharashtra Spice Corridor',
+    originHubId: 'hub-ahmedabad',
+    destHubId: 'hub-mumbai',
     corridorType: 'export_agro',
-    color: '#10b981', // Jade Green
-    commodities: 'Organic Turmeric (Curcumin >= 4.8%), Cumin, Non-GMO Commodities',
-    distanceNauticalMiles: 6350,
-    avgTransitDays: '22–26 Days',
-    incoterms: ['CIF Rotterdam', 'FOB Nhava Sheva'],
-    standards: ['EU MRL (EC) 396/2005', 'APEDA Lab Certified', 'ISO 22000'],
+    color: '#10b981',
+    commodities: 'Unjha Cumin, Organic Turmeric, Sesame & Spices',
+    distanceKm: 530,
+    avgTransitDays: '1 Day',
+    terms: ['FOR Unjha', 'DDP Mumbai', 'CIF'],
+    standards: ['Spices Board QA', 'FSSAI Interstate', 'AGMARK'],
   },
   {
-    id: 'route-dxb-rtm',
-    name: 'Dubai ⇄ Rotterdam Trade Alignment',
-    originHubId: 'hub-dubai',
-    destHubId: 'hub-rotterdam',
+    id: 'route-maa-mh',
+    name: 'Chennai ⇄ Mumbai Tech Supply Corridor',
+    originHubId: 'hub-chennai',
+    destHubId: 'hub-mumbai',
+    corridorType: 'import_electronics',
+    color: '#f59e0b',
+    commodities: 'High-Velocity Mobile Chargers, Cables & Wearables',
+    distanceKm: 1340,
+    avgTransitDays: '2–3 Days',
+    terms: ['DDP Bhiwandi', 'FOR Sriperumbudur', 'EXW'],
+    standards: ['BIS CRS Registered', 'RoHS 2.0', 'E-Way Part-B'],
+  },
+  {
+    id: 'route-pb-blr',
+    name: 'Punjab ⇄ Karnataka Pan-India Grain Rail',
+    originHubId: 'hub-ludhiana',
+    destHubId: 'hub-bengaluru',
+    corridorType: 'export_agro',
+    color: '#059669',
+    commodities: 'Sortex Basmati, Pulses & Processed Food Lots',
+    distanceKm: 2420,
+    avgTransitDays: '3–4 Days',
+    terms: ['FOR Ludhiana', 'DDP Bengaluru'],
+    standards: ['CONCOR Rail Manifest', 'FSSAI Interstate', 'AGMARK'],
+  },
+  {
+    id: 'route-dl-mh',
+    name: 'Delhi NCR ⇄ Mumbai Golden Trunk',
+    originHubId: 'hub-delhi',
+    destHubId: 'hub-mumbai',
     corridorType: 'bilateral',
-    color: '#0284c7', // Steel Blue
-    commodities: 'Bilateral Food Re-Allocation & Strategic Commodities',
-    distanceNauticalMiles: 5400,
-    avgTransitDays: '16–19 Days',
-    incoterms: ['CIF', 'FOB'],
-    standards: ['International Maritime Protocol', 'Customs Pre-Clearance'],
+    color: '#0284c7',
+    commodities: 'Two-Way Agro Balancing & Retail Electronics Freight',
+    distanceKm: 1410,
+    avgTransitDays: '2 Days',
+    terms: ['FOR', 'DDP', 'EXW'],
+    standards: ['Western DFC Rail', 'NIC E-Way Bill', 'IGST B2B'],
   },
 ];
 
-// Simplified geographic landmass polygon paths for Eurasia, Africa, and East Asia (offline, self-contained)
-const WORLD_LANDMASS_POLYGONS: [number, number][][] = [
-  // Western Europe / British Isles / Mediterranean outline
+// Self-contained GeoJSON polygon for India's national outline (clockwise/closed ring)
+const INDIA_LANDMASS_POLYGONS: [number, number][][] = [
   [
-    [-9, 36], [-8, 43], [-1, 46], [3, 51], [8, 54], [10, 57], [18, 58], [24, 60],
-    [32, 65], [40, 67], [50, 68], [60, 66], [66, 60], [60, 55], [50, 50], [40, 45],
-    [30, 42], [24, 38], [15, 38], [5, 36], [-5, 36], [-9, 36]
-  ],
-  // North Africa & Arabian Peninsula
-  [
-    [-17, 21], [-5, 36], [12, 38], [25, 32], [32, 31], [35, 28], [44, 13], [51, 12],
-    [58, 22], [55, 26], [48, 30], [40, 31], [36, 30], [33, 27], [32, 22], [38, 15],
-    [43, 11], [50, 9], [44, 4], [30, -5], [10, 5], [0, 6], [-16, 12], [-17, 21]
-  ],
-  // Indian Subcontinent & South Asia
-  [
-    [62, 25], [68, 24], [70, 22], [72, 19], [76, 10], [77, 8], [80, 10], [80, 13],
-    [85, 20], [88, 22], [90, 24], [80, 28], [74, 34], [68, 30], [62, 25]
-  ],
-  // Southeast Asia & Indonesian Archipelago outline
-  [
-    [98, 10], [101, 3], [104, 1], [108, 12], [109, 18], [105, 21], [100, 18],
-    [98, 14], [98, 10]
-  ],
-  // East Asia & Coast
-  [
-    [105, 21], [110, 20], [118, 25], [122, 30], [120, 38], [128, 42], [115, 40],
-    [100, 35], [90, 32], [85, 27], [90, 24], [100, 22], [105, 21]
+    [68.2, 23.7], [69.0, 22.8], [69.0, 22.2], [70.4, 20.9], [72.2, 21.7],
+    [72.8, 21.1], [72.8, 19.1], [73.3, 17.0], [73.8, 15.4], [74.8, 12.9],
+    [76.2, 9.9], [77.5, 8.1], [79.8, 10.3], [80.3, 13.1], [80.2, 15.8],
+    [82.3, 16.9], [84.8, 19.3], [86.9, 20.8], [88.3, 21.6], [88.9, 22.6],
+    [88.2, 24.5], [88.8, 26.6], [89.9, 26.2], [91.8, 25.2], [92.3, 23.7],
+    [93.0, 23.8], [94.4, 24.8], [95.2, 27.1], [97.3, 28.0], [96.0, 29.2],
+    [92.0, 27.8], [88.8, 27.9], [88.0, 27.2], [85.5, 26.6], [81.5, 28.0],
+    [80.2, 29.8], [79.0, 31.2], [77.8, 32.8], [78.9, 34.4], [76.5, 35.5],
+    [74.5, 35.0], [73.8, 34.0], [74.6, 32.5], [74.5, 31.0], [73.0, 29.5],
+    [70.6, 27.8], [69.5, 26.5], [71.0, 24.7], [68.5, 24.0], [68.2, 23.7],
   ],
 ];
+
+// Approximate highway/rail distance between any two Indian hubs using Haversine * 1.24 road factor
+function estimateInterstateDistanceKm(a: TradeHub, b: TradeHub): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(b.coordinates[1] - a.coordinates[1]);
+  const dLon = toRad(b.coordinates[0] - a.coordinates[0]);
+  const lat1 = toRad(a.coordinates[1]);
+  const lat2 = toRad(b.coordinates[1]);
+  const h =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const straightKm = 2 * R * Math.asin(Math.sqrt(h));
+  return Math.round((straightKm * 1.24) / 10) * 10;
+}
 
 export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps) {
   const [activeFilter, setActiveFilter] = useState<'all' | 'export_agro' | 'import_electronics'>('all');
   const [selectedHub, setSelectedHub] = useState<TradeHub>(HUBS[0]);
   const [hoveredRoute, setHoveredRoute] = useState<TradeRoute | null>(null);
-  const [simulatorOrigin, setSimulatorOrigin] = useState<string>('hub-india');
-  const [simulatorDest, setSimulatorDest] = useState<string>('hub-dubai');
+  const [simulatorOrigin, setSimulatorOrigin] = useState<string>('hub-ludhiana');
+  const [simulatorDest, setSimulatorDest] = useState<string>('hub-mumbai');
 
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Compute filtered routes
   const filteredRoutes = useMemo(() => {
     if (activeFilter === 'all') return ROUTES;
     return ROUTES.filter((r) => r.corridorType === activeFilter || r.corridorType === 'bilateral');
   }, [activeFilter]);
 
-  // Setup D3 Projection
-  // Framing Europe, Africa, Middle East, India, and Southeast Asia:
-  // Center longitude ~58°E, latitude ~26°N
   const dimensions = { width: 920, height: 500 };
 
   const projection = useMemo(() => {
     return d3
       .geoMercator()
-      .center([62, 28])
-      .scale(380)
+      .center([82.0, 21.8])
+      .scale(840)
       .translate([dimensions.width / 2, dimensions.height / 2]);
   }, [dimensions.width, dimensions.height]);
 
@@ -270,7 +333,6 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
     return d3.geoPath().projection(projection);
   }, [projection]);
 
-  // Generate Hub pixel positions
   const hubPositions = useMemo(() => {
     const map = new Map<string, [number, number]>();
     HUBS.forEach((hub) => {
@@ -282,43 +344,40 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
     return map;
   }, [projection]);
 
-  // Generate Bezier curved paths for routes with animated pulse
   const routePaths = useMemo(() => {
-    return filteredRoutes.map((route) => {
-      const originPos = hubPositions.get(route.originHubId);
-      const destPos = hubPositions.get(route.destHubId);
+    return filteredRoutes
+      .map((route) => {
+        const originPos = hubPositions.get(route.originHubId);
+        const destPos = hubPositions.get(route.destHubId);
 
-      if (!originPos || !destPos) return null;
+        if (!originPos || !destPos) return null;
 
-      // Calculate smooth curved arc using quadratic bezier
-      const [x1, y1] = originPos;
-      const [x2, y2] = destPos;
+        const [x1, y1] = originPos;
+        const [x2, y2] = destPos;
 
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const dr = Math.sqrt(dx * dx + dy * dy);
+        const dx = x2 - x1;
+        const dy = y2 - y1;
 
-      // Arc curvature height based on distance
-      const curvature = 0.22;
-      const mx = (x1 + x2) / 2 - dy * curvature;
-      const my = (y1 + y2) / 2 + dx * curvature;
+        const curvature = 0.22;
+        const mx = (x1 + x2) / 2 - dy * curvature;
+        const my = (y1 + y2) / 2 + dx * curvature;
 
-      const d = `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
+        const d = `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
 
-      return {
-        route,
-        d,
-        x1,
-        y1,
-        x2,
-        y2,
-        mx,
-        my,
-      };
-    }).filter(Boolean);
+        return {
+          route,
+          d,
+          x1,
+          y1,
+          x2,
+          y2,
+          mx,
+          my,
+        };
+      })
+      .filter(Boolean);
   }, [filteredRoutes, hubPositions]);
 
-  // Simulator route info
   const simulatedRoute = useMemo(() => {
     const origin = HUBS.find((h) => h.id === simulatorOrigin);
     const dest = HUBS.find((h) => h.id === simulatorDest);
@@ -328,10 +387,19 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
         (r.originHubId === simulatorDest && r.destHubId === simulatorOrigin)
     );
 
+    const estimatedKm =
+      directRoute?.distanceKm ||
+      (origin && dest ? estimateInterstateDistanceKm(origin, dest) : 1400);
+    const estimatedDays =
+      directRoute?.avgTransitDays ||
+      (estimatedKm < 700 ? '1–2 Days' : estimatedKm < 1600 ? '2–3 Days' : '3–5 Days');
+
     return {
       origin,
       dest,
       directRoute,
+      estimatedKm,
+      estimatedDays,
     };
   }, [simulatorOrigin, simulatorDest]);
 
@@ -342,17 +410,16 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
         <div>
           <div className="flex items-center gap-2 text-xs font-mono tracking-widest uppercase text-amber-800 dark:text-amber-300 font-semibold mb-2">
             <Compass className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300" />
-            <span>International Trade Footprint</span>
+            <span>Pan-India Interstate Footprint</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-serif text-slate-900 dark:text-white tracking-tight">
-            Global Trade Network & Active Corridors
+            Interstate Trade Network &amp; Active Corridors
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl font-light leading-relaxed">
-            Interactive D3 visualization of Eximora’s bilateral trading backbone connecting certified agricultural suppliers in India with key commercial hubs in Dubai, Singapore, and Rotterdam.
+            Interactive D3 visualization of Tiffora’s two-way interstate trading backbone connecting certified agricultural state hubs in Punjab and Gujarat with metro commercial and electronics centers in Delhi NCR, Mumbai, Bengaluru, and Chennai.
           </p>
         </div>
 
-        {/* Action Button */}
         {onOpenOrderModal && (
           <div className="flex items-center gap-3 shrink-0">
             <button
@@ -367,12 +434,14 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
         )}
       </div>
 
-      {/* Main Global Network Console Box */}
+      {/* Main Network Console Box */}
       <div className="rounded-2xl bg-white dark:bg-[#090A0F] border border-slate-200 dark:border-white/15 p-5 sm:p-7 shadow-xl dark:shadow-2xl transition-colors">
-        {/* Top Control Bar: Corridor Filter & Network Stats */}
+        {/* Top Control Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-white/10">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-mono uppercase text-slate-500 dark:text-slate-400 font-medium">Corridor Focus:</span>
+            <span className="text-xs font-mono uppercase text-slate-500 dark:text-slate-400 font-medium">
+              Corridor Focus:
+            </span>
             <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-white/[0.04] rounded-lg border border-slate-200 dark:border-white/10 shadow-xs">
               <button
                 type="button"
@@ -383,7 +452,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                All Corridors (4 Hubs)
+                All Corridors (6 State Hubs)
               </button>
               <button
                 type="button"
@@ -395,7 +464,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                 }`}
               >
                 <Wheat className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                <span>Agro Exports</span>
+                <span>State Agro Dispatch</span>
               </button>
               <button
                 type="button"
@@ -407,7 +476,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                 }`}
               >
                 <Cpu className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                <span>Electronics Imports</span>
+                <span>Electronics Supply</span>
               </button>
             </div>
           </div>
@@ -416,23 +485,21 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
           <div className="flex items-center gap-4 text-xs font-mono text-slate-500 dark:text-slate-400">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>Export Corridors</span>
+              <span>State Agro Routes</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-amber-500" />
-              <span>Import Corridors</span>
+              <span>Tech Hub Routes</span>
             </span>
             <span className="hidden lg:inline text-slate-400 dark:text-slate-600">·</span>
-            <span className="hidden lg:inline">Asset-Light Routing</span>
+            <span className="hidden lg:inline">E-Way &amp; IGST Synced</span>
           </div>
         </div>
 
         {/* Interactive D3 Visualization Canvas */}
         <div className="relative mt-6 rounded-xl bg-slate-950 overflow-hidden border border-slate-200 dark:border-white/10 shadow-inner group">
-          {/* Subtle Grid Lines & Latitude Graticules */}
           <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
-          {/* SVG Map Container */}
           <div ref={containerRef} className="w-full aspect-[16/9] sm:aspect-[1.9/1] relative select-none">
             <svg
               ref={svgRef}
@@ -440,7 +507,6 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
               className="w-full h-full block"
             >
               <defs>
-                {/* Glow Filter for Active Routes */}
                 <filter id="emerald-glow" x="-20%" y="-20%" width="140%" height="140%">
                   <feGaussianBlur stdDeviation="3" result="blur" />
                   <feMerge>
@@ -455,25 +521,11 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                     <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
-
-                {/* Linear Gradients along routes */}
-                <linearGradient id="grad-india-dubai" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#059669" stopOpacity="1" />
-                </linearGradient>
-                <linearGradient id="grad-singapore-india" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#d97706" stopOpacity="1" />
-                </linearGradient>
-                <linearGradient id="grad-india-rotterdam" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#34d399" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#059669" stopOpacity="1" />
-                </linearGradient>
               </defs>
 
-              {/* 1. Geographical Landmass Shapes (D3 Rendered) */}
-              <g className="landmasses" opacity="0.85">
-                {WORLD_LANDMASS_POLYGONS.map((polygon, pIdx) => {
+              {/* 1. Geographical India Outline (D3 Rendered) */}
+              <g className="landmasses" opacity="0.9">
+                {INDIA_LANDMASS_POLYGONS.map((polygon, pIdx) => {
                   const geoJsonPolygon: any = {
                     type: 'Polygon',
                     coordinates: [polygon],
@@ -481,20 +533,20 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                   const pathData = pathGenerator(geoJsonPolygon);
                   return (
                     <path
-                      key={`land-${pIdx}`}
+                      key={`india-land-${pIdx}`}
                       d={pathData || ''}
                       fill="#161A24"
-                      stroke="#272D3D"
-                      strokeWidth="1"
+                      stroke="#334155"
+                      strokeWidth="1.4"
                       className="transition-colors hover:fill-[#1B2130]"
                     />
                   );
                 })}
               </g>
 
-              {/* 2. Maritime Route Lines (D3 Quadratic Arcs with animated pulse flow) */}
+              {/* 2. Interstate Route Lines (D3 Quadratic Arcs) */}
               <g className="trade-routes">
-                {routePaths.map((rp, rIdx) => {
+                {routePaths.map((rp) => {
                   if (!rp) return null;
                   const isHovered = hoveredRoute?.id === rp.route.id;
                   const isAgro = rp.route.corridorType === 'export_agro';
@@ -507,26 +559,18 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                       onMouseLeave={() => setHoveredRoute(null)}
                       className="cursor-pointer"
                     >
-                      {/* Wide invisible hit area for easy hover */}
-                      <path
-                        d={rp.d}
-                        fill="none"
-                        stroke="transparent"
-                        strokeWidth="18"
-                      />
+                      <path d={rp.d} fill="none" stroke="transparent" strokeWidth="18" />
 
-                      {/* Route Base Arc */}
                       <path
                         d={rp.d}
                         fill="none"
                         stroke={strokeColor}
                         strokeWidth={isHovered ? 3.5 : 2}
-                        strokeOpacity={isHovered ? 0.9 : 0.45}
+                        strokeOpacity={isHovered ? 0.9 : 0.48}
                         strokeDasharray={isAgro ? '6,4' : '4,3'}
                         className="transition-all duration-200"
                       />
 
-                      {/* Animated Pulse Beam along route */}
                       <path
                         d={rp.d}
                         fill="none"
@@ -538,7 +582,6 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                         filter={isAgro ? 'url(#emerald-glow)' : 'url(#amber-glow)'}
                       />
 
-                      {/* Midpoint Vessel Badge */}
                       <circle
                         cx={rp.mx}
                         cy={rp.my}
@@ -553,19 +596,19 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                 })}
               </g>
 
-              {/* 3. Trade Hub Pins & Pulsing Concentric Radar Rings */}
+              {/* 3. State Trade Hub Pins */}
               <g className="trade-hubs">
                 {HUBS.map((hub) => {
                   const pos = hubPositions.get(hub.id);
                   if (!pos) return null;
                   const [cx, cy] = pos;
                   const isSelected = selectedHub.id === hub.id;
-                  const isHQ = hub.type === 'headquarters';
-                  const hubColor = isHQ
-                    ? '#F59E0B' // Golden Amber
-                    : hub.type === 'agro_export' || hub.type === 'european_terminal'
-                    ? '#10B981' // Emerald
-                    : '#F59E0B'; // Amber
+                  const isAgro = hub.type === 'agro_export';
+                  const hubColor = isAgro ? '#10B981' : '#F59E0B';
+                  const shortLabel = hub.name.split('(')[0].split('/')[0].trim();
+
+                  // Offset label slightly for nearby Bengaluru/Chennai pins so labels never collide
+                  const labelOffsetY = hub.id === 'hub-bengaluru' ? 18 : hub.id === 'hub-chennai' ? -16 : 16;
 
                   return (
                     <g
@@ -574,52 +617,48 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                       className="cursor-pointer group/node"
                       transform={`translate(${cx}, ${cy})`}
                     >
-                      {/* Pulse Wave Radar Ring */}
                       <circle
-                        r={isSelected ? 18 : 12}
+                        r={isSelected ? 18 : 11}
                         fill={hubColor}
                         fillOpacity={isSelected ? 0.25 : 0.12}
                         className="animate-ping origin-center duration-3000"
                       />
 
-                      {/* Outer Selection Ring */}
                       <circle
-                        r={isSelected ? 10 : 7}
+                        r={isSelected ? 9.5 : 6.5}
                         fill="#0A0C14"
                         stroke={hubColor}
                         strokeWidth={isSelected ? 2.5 : 1.5}
                         className="transition-all duration-200"
                       />
 
-                      {/* Center Core Dot */}
                       <circle
-                        r={isSelected ? 4 : 3}
+                        r={isSelected ? 4 : 2.8}
                         fill={hubColor}
                         className="transition-transform group-hover/node:scale-125"
                       />
 
-                      {/* Port Label Tag */}
-                      <g transform="translate(0, 16)" className="pointer-events-none select-none">
+                      <g transform={`translate(0, ${labelOffsetY})`} className="pointer-events-none select-none">
                         <rect
-                          x={-hub.name.length * 3.4}
+                          x={-shortLabel.length * 3.8 - 6}
                           y={-7}
-                          width={hub.name.length * 6.8}
+                          width={shortLabel.length * 7.6 + 12}
                           height={14}
                           rx={3}
-                          fill="#090A0ECC"
-                          stroke={isSelected ? hubColor : '#ffffff15'}
+                          fill="#090A0ED9"
+                          stroke={isSelected ? hubColor : '#ffffff20'}
                           strokeWidth="0.8"
                         />
                         <text
                           textAnchor="middle"
                           y={3}
-                          fill={isSelected ? '#FFFFFF' : '#94A3B8'}
-                          fontSize="9"
+                          fill={isSelected ? '#FFFFFF' : '#CBD5E1'}
+                          fontSize="9.5"
                           fontFamily="monospace"
                           fontWeight={isSelected ? 'bold' : 'normal'}
-                          letterSpacing="0.05em"
+                          letterSpacing="0.04em"
                         >
-                          {hub.name}
+                          {shortLabel}
                         </text>
                       </g>
                     </g>
@@ -632,22 +671,22 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
             <div className="absolute bottom-3 left-3 p-2.5 rounded-lg bg-black/80 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300 space-y-1 pointer-events-none hidden sm:block">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-400" />
-                <span>India HQ · JNPT & Mundra</span>
+                <span>Delhi NCR &amp; Mumbai · Commercial &amp; Tech HQs</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Dubai (Jebel Ali) & Rotterdam</span>
+                <span>Ludhiana &amp; Ahmedabad · Surplus Agro Origins</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-400" />
-                <span>Singapore (Tech Procurement)</span>
+                <span>Bengaluru &amp; Chennai · Southern Tech &amp; Retail</span>
               </div>
             </div>
 
-            {/* Reset / Zoom Indicator (Top Right) */}
+            {/* Projection Indicator (Top Right) */}
             <div className="absolute top-3 right-3 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300">
-                Mercator Centered: 62°E, 28°N
+                India Mercator: 82.0°E, 21.8°N
               </span>
             </div>
           </div>
@@ -655,17 +694,17 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
 
         {/* Interactive Hub Detail & Corridor Dossier Strip */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mt-6 items-stretch">
-          {/* Left Column: Selected Hub Port Profile (7 Cols) */}
+          {/* Left Column: Selected State Hub Profile */}
           <div className="lg:col-span-7 p-5 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 flex flex-col justify-between text-left shadow-xs">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/5">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
                   <span className="text-xs font-mono uppercase text-amber-800 dark:text-amber-300 font-semibold tracking-wider">
-                    {selectedHub.region} Hub
+                    {selectedHub.state} · {selectedHub.region}
                   </span>
                 </div>
-                <span className="text-xs font-mono text-slate-500">{selectedHub.portCode}</span>
+                <span className="text-xs font-mono text-slate-500">{selectedHub.hubCode}</span>
               </div>
 
               <div className="mt-4">
@@ -674,7 +713,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                     {selectedHub.name}
                   </h3>
                   <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
-                    {selectedHub.portName}
+                    {selectedHub.terminalName}
                   </span>
                 </div>
 
@@ -683,11 +722,10 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                 </p>
               </div>
 
-              {/* Commodities & Compliance Badges */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-3 border-t border-slate-200 dark:border-white/5">
                 <div>
                   <span className="text-[10px] font-mono uppercase text-slate-500 block mb-1.5 font-semibold">
-                    Key Commodities Traded:
+                    Key Interstate Commodities:
                   </span>
                   <div className="space-y-1">
                     {selectedHub.primaryCommodities.map((item, idx) => (
@@ -701,7 +739,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
 
                 <div>
                   <span className="text-[10px] font-mono uppercase text-slate-500 block mb-1.5 font-semibold">
-                    Statutory Compliance Norms:
+                    Interstate Compliance Norms:
                   </span>
                   <div className="space-y-1">
                     {selectedHub.certifications.map((cert, idx) => (
@@ -715,16 +753,16 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
               </div>
             </div>
 
-            {/* Maritime Transit Schedules & Order Action */}
+            {/* Express Highway / Rail Transit Schedules */}
             <div className="mt-5 pt-3 border-t border-slate-200 dark:border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
               <div className="flex flex-wrap items-center gap-3 text-slate-600 dark:text-slate-400">
                 <span className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                  <Anchor className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                  <span>Sea Transit:</span>
+                  <Truck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Line-Haul Transit:</span>
                 </span>
                 {selectedHub.transitTimes.map((tt, idx) => (
                   <span key={idx}>
-                    {tt.destination}: <strong className="text-slate-900 dark:text-white font-mono">{tt.seaDays}</strong>
+                    {tt.destination}: <strong className="text-slate-900 dark:text-white font-mono">{tt.transitDays}</strong>
                     {idx < selectedHub.transitTimes.length - 1 && ' · '}
                   </span>
                 ))}
@@ -736,7 +774,10 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                   onClick={() => {
                     const corridorTarget: TradeCorridor =
                       selectedHub.type === 'electronics_import' ? 'import_electronics' : 'export_agro';
-                    onOpenOrderModal(corridorTarget, `Trade consignment involving ${selectedHub.name} (${selectedHub.portName})`);
+                    onOpenOrderModal(
+                      corridorTarget,
+                      `Interstate consignment involving ${selectedHub.name}, ${selectedHub.state}`
+                    );
                   }}
                   className="text-xs font-semibold text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200 inline-flex items-center gap-1 cursor-pointer shrink-0"
                 >
@@ -747,22 +788,24 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
             </div>
           </div>
 
-          {/* Right Column: Interactive Transit & Corridor Router (5 Cols) */}
+          {/* Right Column: Interactive Interstate Corridor Router */}
           <div className="lg:col-span-5 p-5 rounded-xl bg-slate-50/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 flex flex-col justify-between text-left shadow-xs">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/5">
                 <span className="text-xs font-mono uppercase text-slate-500 font-semibold flex items-center gap-1.5">
                   <Radio className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300" />
-                  <span>Corridor Transit Calculator</span>
+                  <span>Interstate Transit Calculator</span>
                 </span>
-                <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-400 font-medium">Active Schedule</span>
+                <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-400 font-medium">
+                  Active Schedule
+                </span>
               </div>
 
-              {/* Origin / Destination Pickers */}
+              {/* Origin / Destination State Hub Pickers */}
               <div className="grid grid-cols-2 gap-3 my-4">
                 <div>
                   <label className="text-[10px] font-mono uppercase text-slate-500 block mb-1">
-                    Origin Port Hub:
+                    Origin State Hub:
                   </label>
                   <select
                     value={simulatorOrigin}
@@ -771,7 +814,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                   >
                     {HUBS.map((h) => (
                       <option key={`origin-${h.id}`} value={h.id}>
-                        {h.name}
+                        {h.name.split('(')[0].trim()} ({h.state})
                       </option>
                     ))}
                   </select>
@@ -779,7 +822,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
 
                 <div>
                   <label className="text-[10px] font-mono uppercase text-slate-500 block mb-1">
-                    Destination Hub:
+                    Destination State Hub:
                   </label>
                   <select
                     value={simulatorDest}
@@ -788,7 +831,7 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
                   >
                     {HUBS.map((h) => (
                       <option key={`dest-${h.id}`} value={h.id} disabled={h.id === simulatorOrigin}>
-                        {h.name}
+                        {h.name.split('(')[0].trim()} ({h.state})
                       </option>
                     ))}
                   </select>
@@ -798,50 +841,50 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
               {/* Transit Calculation Output */}
               <div className="p-3.5 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 space-y-2 text-xs">
                 <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-slate-500">Route Corridor:</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">
-                    {simulatedRoute.directRoute ? simulatedRoute.directRoute.name : 'Bilateral Multi-Leg Freight'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-slate-500">Nautical Distance:</span>
-                  <span className="font-mono text-slate-900 dark:text-white">
+                  <span className="text-slate-500">Interstate Corridor:</span>
+                  <span className="font-semibold text-slate-900 dark:text-white text-right">
                     {simulatedRoute.directRoute
-                      ? `${simulatedRoute.directRoute.distanceNauticalMiles.toLocaleString()} NM`
-                      : '3,200+ NM'}
+                      ? simulatedRoute.directRoute.name
+                      : `${simulatedRoute.origin?.state} → ${simulatedRoute.dest?.state}`}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-slate-500">Estimated Sea Transit:</span>
+                  <span className="text-slate-500">Highway / Rail Distance:</span>
+                  <span className="font-mono text-slate-900 dark:text-white">
+                    {simulatedRoute.estimatedKm.toLocaleString()} km
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-slate-500">Estimated Road / Rail Transit:</span>
                   <span className="font-mono font-bold text-amber-700 dark:text-amber-300">
-                    {simulatedRoute.directRoute ? simulatedRoute.directRoute.avgTransitDays : '7–12 Days'}
+                    {simulatedRoute.estimatedDays}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] font-mono pt-1.5 border-t border-slate-100 dark:border-white/5">
-                  <span className="text-slate-500">Standard Incoterms:</span>
+                  <span className="text-slate-500">Interstate Freight Terms:</span>
                   <span className="font-mono text-emerald-700 dark:text-emerald-400">
-                    {simulatedRoute.directRoute ? simulatedRoute.directRoute.incoterms.join(' · ') : 'CIF · FOB · DDP'}
+                    {simulatedRoute.directRoute ? simulatedRoute.directRoute.terms.join(' · ') : 'FOR · DDP · EXW'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Quick Action Button */}
             {onOpenOrderModal && (
               <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/5">
                 <button
                   type="button"
                   onClick={() => {
-                    const isImport =
-                      simulatedRoute.origin?.id === 'hub-singapore' ||
-                      simulatedRoute.dest?.id === 'hub-singapore';
-                    const targetCorridor: TradeCorridor = isImport ? 'import_electronics' : 'export_agro';
+                    const isTech =
+                      simulatedRoute.origin?.id === 'hub-chennai' ||
+                      simulatedRoute.origin?.id === 'hub-delhi' ||
+                      simulatedRoute.dest?.id === 'hub-bengaluru';
+                    const targetCorridor: TradeCorridor = isTech ? 'import_electronics' : 'export_agro';
                     onOpenOrderModal(
                       targetCorridor,
-                      `Book consignment between ${simulatedRoute.origin?.name} and ${simulatedRoute.dest?.name}`
+                      `Book interstate consignment from ${simulatedRoute.origin?.name} (${simulatedRoute.origin?.state}) to ${simulatedRoute.dest?.name} (${simulatedRoute.dest?.state})`
                     );
                   }}
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 transition-all cursor-pointer shadow-sm"
@@ -858,9 +901,9 @@ export function GlobalTradeNetwork({ onOpenOrderModal }: GlobalTradeNetworkProps
         <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
           <div className="flex items-center gap-2">
             <span className="text-amber-700 dark:text-amber-300 font-semibold uppercase">Footprint Standard:</span>
-            <span>Asset-light bilateral corridors connecting India, Dubai, Singapore, and Rotterdam.</span>
+            <span>Asset-light interstate corridors connecting Delhi NCR, Punjab, Gujarat, Maharashtra, Karnataka &amp; Tamil Nadu.</span>
           </div>
-          <span className="text-slate-400 dark:text-slate-500 shrink-0">D3 Geodesic Projection</span>
+          <span className="text-slate-400 dark:text-slate-500 shrink-0">D3 India Mercator Projection</span>
         </div>
       </div>
     </div>

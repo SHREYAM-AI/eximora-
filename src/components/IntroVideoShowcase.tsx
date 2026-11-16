@@ -24,34 +24,34 @@ export function IntroVideoShowcase({
 
   const previewChapters = [
     {
-      title: 'The Bilateral Vision',
+      title: 'The Interstate Vision',
       duration: '00:22',
-      corridor: 'Bilateral Architecture',
+      corridor: 'Interstate Architecture',
       icon: Layers,
       color: 'amber',
       image: '/src/assets/images/video_intro_poster_1794159305622.jpg',
       description:
-        'An asset-light cross-border trading company connecting Indian harvest producers with international buyers, while importing certified tech accessories for Indian sellers.',
+        'An asset-light interstate trading house connecting producer-state farmers with pan-India buyers, while supplying certified tech accessories from metro hubs to state retail.',
     },
     {
-      title: 'Food & Agro Export Corridor',
+      title: 'State Agro Dispatch Corridor',
       duration: '00:23',
-      corridor: 'India → World',
+      corridor: 'Producer States → Pan-India',
       icon: Wheat,
       color: 'emerald',
       image: '/src/assets/images/video_scene_agro_export_1794159306274.jpg',
       description:
-        'Direct sourcing of Basmati rice, organic spices, and pulses from certified farmer cooperatives in Punjab & Gujarat with APEDA & FSSAI laboratory testing.',
+        'Direct sourcing of Basmati rice, Unjha cumin, and pulses from FPO cooperatives in Punjab & Gujarat with FSSAI Interstate, AGMARK, and NIC E-Way compliance.',
     },
     {
-      title: 'Electronics Import Corridor',
+      title: 'Electronics Supply Corridor',
       duration: '00:23',
-      corridor: 'World → India',
+      corridor: 'Metro Hubs → State Retail',
       icon: Cpu,
       color: 'amber',
       image: '/src/assets/images/video_scene_electronics_import_1794159307584.jpg',
       description:
-        'High-velocity GaN wall chargers, braided 100W PD cables, and consumer audio peripherals with rigorous BIS CRS IS 13252 & RoHS certification.',
+        'High-velocity GaN wall chargers, braided 100W PD cables, and consumer audio peripherals from NCR & Chennai hubs with full BIS CRS IS 13252 & LMPC compliance.',
     },
     {
       title: 'Four Operating Pillars',
@@ -61,7 +61,7 @@ export function IntroVideoShowcase({
       color: 'amber',
       image: '/src/assets/images/video_scene_trading_desk_1794159307086.jpg',
       description:
-        'Zero factory overhead. End-to-end container logistics, rapid AI inquiry placement, and fully transparent bilateral customs clearance.',
+        'Zero factory overhead. End-to-end highway and CONCOR rail logistics, rapid AI inquiry placement, QR dispatch passes, and transparent IGST settlement.',
     },
   ];
 
@@ -78,10 +78,10 @@ export function IntroVideoShowcase({
             <span>Corporate Introduction Video</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-serif text-slate-900 dark:text-white tracking-tight">
-            Inside Eximora: Bilateral Trading in 90 Seconds
+            Inside Tiffora: Interstate Trading in 90 Seconds
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-xl font-light">
-            Explore our asset-light operating model, dual export and import corridors, and statutory quality certification protocols.
+            Explore our asset-light operating model, dual state agro dispatch and metro tech supply corridors, and statutory quality protocols.
           </p>
         </div>
 
@@ -228,7 +228,7 @@ export function IntroVideoShowcase({
                 onClick={() => onOpenOrderModal('export_agro')}
                 className="text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200 font-medium cursor-pointer"
               >
-                Order Agro Export
+                Order Agro Dispatch
               </button>
               <span className="text-slate-300 dark:text-white/20">·</span>
               <button
@@ -236,7 +236,7 @@ export function IntroVideoShowcase({
                 onClick={() => onOpenOrderModal('import_electronics')}
                 className="text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200 font-medium cursor-pointer"
               >
-                Order Electronics Import
+                Order Electronics Supply
               </button>
             </div>
           )}

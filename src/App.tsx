@@ -17,6 +17,7 @@ import { TradeCommunityHub } from './components/TradeCommunityHub';
 import { AdminCentreModal } from './components/AdminCentreModal';
 import { IntroVideoModal } from './components/IntroVideoModal';
 import { IntroVideoShowcase } from './components/IntroVideoShowcase';
+import { TiffyComingSoonSection } from './components/TiffyComingSoonSection';
 import { GlobalTradeNetwork } from './components/GlobalTradeNetwork';
 import { TradeOrder, TradeCorridor } from './types/order';
 import { ArrowUpRight, ArrowRight, ArrowLeftRight, Wheat, Cpu, CheckCircle, Sparkles, Shield, Users, X, Bell, Radio, Play, Film, Globe } from 'lucide-react';
@@ -42,15 +43,23 @@ export default function App() {
   const [orders, setOrders] = useState<TradeOrder[]>([]);
   const [incomingToast, setIncomingToast] = useState<TradeOrder | null>(null);
   const [unreadAdminOrdersCount, setUnreadAdminOrdersCount] = useState<number>(0);
+  const [waitlistCategoryOverride, setWaitlistCategoryOverride] = useState<string | null>(null);
+  const [trackedOrderQuery, setTrackedOrderQuery] = useState<string | null>(() => {
+    try {
+      return new URLSearchParams(window.location.search).get('track');
+    } catch {
+      return null;
+    }
+  });
 
   // Record visitor session telemetry
   useEffect(() => {
     try {
-      let sessionId = sessionStorage.getItem('eximora_session_id');
+      let sessionId = sessionStorage.getItem('tiffora_session_id') || sessionStorage.getItem('eximora_session_id');
       if (!sessionId) {
         sessionId = 'sess-' + Math.random().toString(36).substring(2, 9);
-        sessionStorage.setItem('eximora_session_id', sessionId);
       }
+      sessionStorage.setItem('tiffora_session_id', sessionId);
       fetch('/api/visits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -79,6 +88,26 @@ export default function App() {
         console.warn('Could not fetch server orders:', err);
       });
   }, []);
+
+  // Scroll smoothly to Order Pipeline when accessed via QR tracking URL
+  useEffect(() => {
+    if (trackedOrderQuery) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('ai-order-system');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [trackedOrderQuery]);
+
+  const handleClearTrackedQuery = () => {
+    setTrackedOrderQuery(null);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('track');
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
+  };
 
   // Real-time Server-Sent Events (SSE) listener: Instant notification when vendor places order
   useEffect(() => {
@@ -193,13 +222,13 @@ export default function App() {
             lastUpdated: now,
             milestones: updatedMilestones,
             fulfillmentDoc: {
-              trackingNumber: `EXM-TRK-${Math.floor(100000 + Math.random() * 900000)}`,
+              trackingNumber: `EWB-${Math.floor(100000000 + Math.random() * 900000000)}`,
               vesselOrFlight:
                 ord.corridor === 'export_agro'
-                  ? 'CMA CGM Mumbai Express / Voy 104W'
-                  : 'Singapore Airlines Cargo SQ-712',
-              inspectionPassId: `CERT-PASS-${Math.floor(1000 + Math.random() * 9000)}`,
-              fulfillmentStatus: 'In Execution - Vessel/Flight Dispatched',
+                  ? 'NH-48 Express Container Truck MH-04-EX-8821'
+                  : 'CONCOR Domestic Rail Rake #104',
+              inspectionPassId: `QC-PASS-${Math.floor(1000 + Math.random() * 9000)}`,
+              fulfillmentStatus: 'In Execution - Interstate Transit Active',
             },
           };
         } else if (ord.stage === 'execution') {
@@ -210,9 +239,9 @@ export default function App() {
             lastUpdated: now,
             milestones: ord.milestones.map((m) => ({ ...m, completed: true })),
             fulfillmentDoc: {
-              trackingNumber: ord.fulfillmentDoc?.trackingNumber || 'EXM-TRK-980112',
-              vesselOrFlight: ord.fulfillmentDoc?.vesselOrFlight || 'Direct Cargo Express',
-              inspectionPassId: ord.fulfillmentDoc?.inspectionPassId || 'CERT-PASS-8819',
+              trackingNumber: ord.fulfillmentDoc?.trackingNumber || 'EWB-980112450',
+              vesselOrFlight: ord.fulfillmentDoc?.vesselOrFlight || 'Interstate Express Cargo',
+              inspectionPassId: ord.fulfillmentDoc?.inspectionPassId || 'QC-PASS-8819',
               fulfillmentStatus: 'Fulfilled & Handed Over',
             },
           };
@@ -231,6 +260,11 @@ export default function App() {
         setTimeout(() => input.focus(), 350);
       }
     }
+  };
+
+  const handleNotifyTiffy = () => {
+    setWaitlistCategoryOverride('Tiffy Early Access');
+    scrollToWaitlist();
   };
 
   return (
@@ -256,35 +290,41 @@ export default function App() {
           className="text-lg sm:text-xl font-brand font-bold tracking-[0.22em] uppercase text-slate-900 hover:text-amber-700 dark:text-white dark:hover:text-amber-200 transition-colors whitespace-nowrap shrink-0 flex items-center gap-2.5"
         >
           <span className="w-6 h-6 rounded-md bg-slate-900/5 dark:bg-white/[0.06] border border-slate-300 dark:border-white/20 flex items-center justify-center font-serif text-[11px] font-semibold text-amber-700 dark:text-amber-200 tracking-normal shadow-inner">
-            E
+            T
           </span>
-          <span>Eximora</span>
+          <span>Tiffora</span>
         </a>
 
         {/* Zone 2: Concise single-line text navigation links */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-xs font-medium tracking-wider uppercase text-slate-600 dark:text-slate-400">
+        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-xs font-medium tracking-wider uppercase text-slate-600 dark:text-slate-400">
           <button
             type="button"
             onClick={() => handleOpenVideoModal(0)}
             className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer text-amber-800 dark:text-amber-200 font-semibold"
-            title="Watch 90-second Eximora introduction video"
+            title="Watch 90-second Tiffora introduction video"
           >
             <Play className="w-3 h-3 fill-current text-amber-600 dark:text-amber-300" />
             <span>Intro Video</span>
           </button>
           <a
+            href="#tiffy"
+            className="hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 text-emerald-800 dark:text-emerald-300 font-semibold"
+          >
+            Tiffy
+          </a>
+          <a
             href="#global-network"
             className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5"
           >
             <Globe className="w-3 h-3 text-amber-600 dark:text-amber-300" />
-            <span>Global Network</span>
+            <span>Interstate Network</span>
           </a>
           <a
             href="#trade-community"
             className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 flex items-center gap-1.5"
           >
             <Users className="w-3 h-3 text-amber-600 dark:text-amber-300" />
-            <span>Community & Insights</span>
+            <span>Community</span>
           </a>
           <a
             href="#ai-order-system"
@@ -293,18 +333,6 @@ export default function App() {
             <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-300" />
             <span>AI Order Desk</span>
           </a>
-          <a
-            href="#market-performance"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0"
-          >
-            Market Trends
-          </a>
-          <a
-            href="#corridors"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0"
-          >
-            Two-Way Trade
-          </a>
           <button
             type="button"
             onClick={() => {
@@ -312,7 +340,7 @@ export default function App() {
               setUnreadAdminOrdersCount(0);
             }}
             className="hover:text-amber-800 dark:hover:text-amber-200 transition-colors underline-offset-8 hover:underline whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-medium relative"
-            title="Open Eximora Operations & Intelligence Centre"
+            title="Open Tiffora Operations & Intelligence Centre"
           >
             <Shield className="w-3.5 h-3.5" />
             <span>Admin Centre</span>
@@ -353,16 +381,16 @@ export default function App() {
 
         {/* Clean Unboxed Kicker Metadata */}
         <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-mono tracking-[0.22em] uppercase text-amber-800 dark:text-amber-300/80 mb-5 font-semibold">
-          <span>Two-Way Cross-Border Trading</span>
+          <span>Two-Way Interstate Trading</span>
           <span aria-hidden="true">·</span>
           <span>Asset-Light Trader</span>
           <span aria-hidden="true">·</span>
-          <span>AI Order Placement Active</span>
+          <span>Pan-India Corridors Active</span>
         </div>
 
         {/* Primary Headline */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-brand font-medium tracking-tight text-slate-900 dark:text-white leading-[1.14] max-w-3xl mx-auto text-balance">
-          Bilateral trade, precision orchestrated.
+          Interstate trade, precision orchestrated.
         </h1>
 
         {/* PROMINENT INTRODUCTION */}
@@ -372,15 +400,15 @@ export default function App() {
 
           <div className="space-y-4 text-slate-700 dark:text-slate-200 leading-relaxed font-light text-base sm:text-lg">
             <p className="text-slate-900 dark:text-white font-normal text-lg sm:text-xl font-serif">
-              Eximora is a two-way trading company.
+              Tiffora is a two-way interstate trading company across India.
             </p>
             <p className="text-slate-600 dark:text-slate-300">
-              It exports food products from Indian farmers and processors to overseas buyers, and imports electronic accessories for Indian wholesalers, retailers and online sellers.
+              It exports food products from farmers and FPOs in surplus producer states to commercial buyers in consumer states, and imports high-demand electronic accessories from metro tech hubs for state wholesalers, retailers, and online sellers.
             </p>
             <div className="pt-2 border-t border-slate-100 dark:border-white/10 flex items-start gap-3">
               <span className="text-amber-700 dark:text-amber-300 text-xs font-mono uppercase tracking-widest pt-1 shrink-0 font-semibold">Model</span>
               <p className="text-amber-900 dark:text-amber-100/95 italic font-serif text-sm sm:text-base font-normal">
-                It is an asset-light trader: it does not manufacture, it sources, certifies, ships and sells.
+                It is an asset-light trader: it does not manufacture, it sources, certifies, ships and sells across state borders.
               </p>
             </div>
           </div>
@@ -416,6 +444,14 @@ export default function App() {
           </button>
         </div>
 
+        {/* TIFFY COMING SOON SPOTLIGHT */}
+        <div className="w-full">
+          <TiffyComingSoonSection
+            onNotifyMe={handleNotifyTiffy}
+            onOpenOrderModal={handleOpenOrderModal}
+          />
+        </div>
+
         {/* FEATURED INTRO VIDEO SHOWCASE */}
         <div className="w-full">
           <IntroVideoShowcase
@@ -424,21 +460,21 @@ export default function App() {
           />
         </div>
 
-        {/* Bilateral Trade Corridors Presentation */}
+        {/* Interstate Trade Corridors Presentation */}
         <div id="corridors" className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-3xl mx-auto text-left">
-          {/* Corridor 1: Export */}
+          {/* Corridor 1: State Agro Dispatch */}
           <div className="p-6 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all shadow-xs dark:shadow-none flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
                 <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 font-semibold">
                   <Wheat className="w-3.5 h-3.5" />
-                  <span>Export Corridor</span>
+                  <span>State Export Corridor</span>
                 </span>
-                <span className="text-xs text-slate-500 font-mono">India → Overseas</span>
+                <span className="text-xs text-slate-500 font-mono">Producer States → Pan-India</span>
               </div>
-              <h3 className="text-base font-serif text-slate-900 dark:text-white mt-3 font-medium">Food & Agro Products</h3>
+              <h3 className="text-base font-serif text-slate-900 dark:text-white mt-3 font-medium">Food &amp; Agro Products</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Sourcing authentic harvests and food items from Indian agricultural producers and certified processors, fulfilling bulk import contracts for overseas commercial buyers.
+                Sourcing authentic harvests from farmer cooperatives and FPOs in Punjab, Gujarat, MP, and Andhra Pradesh to fulfill interstate contracts for buyers in Maharashtra, Karnataka, Delhi NCR, and Tamil Nadu.
               </p>
             </div>
 
@@ -447,24 +483,24 @@ export default function App() {
               onClick={() => handleOpenOrderModal('export_agro')}
               className="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors cursor-pointer"
             >
-              <span>Order Food Exports with AI</span>
+              <span>Order State Agro Supply with AI</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          {/* Corridor 2: Import */}
+          {/* Corridor 2: Metro Electronics Supply */}
           <div className="p-6 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all shadow-xs dark:shadow-none flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
                 <span className="text-[11px] font-mono uppercase tracking-widest text-amber-700 dark:text-amber-300 flex items-center gap-1.5 font-semibold">
                   <Cpu className="w-3.5 h-3.5" />
-                  <span>Import Corridor</span>
+                  <span>State Import Corridor</span>
                 </span>
-                <span className="text-xs text-slate-500 font-mono">Global → India</span>
+                <span className="text-xs text-slate-500 font-mono">Metro Hubs → State Retail</span>
               </div>
               <h3 className="text-base font-serif text-slate-900 dark:text-white mt-3 font-medium">Electronic Accessories</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Procuring high-turnover consumer electronic accessories directly from international hubs to supply verified Indian wholesalers, retailers, and e-commerce sellers.
+                Procuring high-turnover consumer electronic accessories from verified manufacturing &amp; consolidation hubs in Delhi NCR, Noida, Chennai, and Mumbai for state wholesalers, retailers, and online sellers.
               </p>
             </div>
 
@@ -473,7 +509,7 @@ export default function App() {
               onClick={() => handleOpenOrderModal('import_electronics')}
               className="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200 transition-colors cursor-pointer"
             >
-              <span>Order Electronics Imports with AI</span>
+              <span>Order Electronics Supply with AI</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
@@ -523,18 +559,20 @@ export default function App() {
             orders={orders}
             onOpenOrderModal={() => handleOpenOrderModal('export_agro')}
             onAdvanceOrder={handleAdvanceOrder}
+            trackedOrderQuery={trackedOrderQuery}
+            onClearTrackedQuery={handleClearTrackedQuery}
           />
         </div>
 
         {/* Registration Desk Form */}
         <div id="register-section" className="mt-16 sm:mt-20 w-full scroll-mt-24">
-          <WaitlistForm />
+          <WaitlistForm externalCategory={waitlistCategoryOverride} />
         </div>
 
         {/* Secondary Editorial Actions */}
         <div className="mt-14 pt-8 border-t border-slate-200 dark:border-white/[0.06] w-full max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-2">
-            <span>Asset-light cross-border trade operations</span>
+            <span>Asset-light interstate trade operations across India</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -570,23 +608,27 @@ export default function App() {
           {/* Wordmark and Legal */}
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-center sm:text-left">
             <span className="font-brand font-semibold tracking-widest text-slate-800 dark:text-slate-300 uppercase">
-              Eximora
+              Tiffora
             </span>
             <span className="hidden sm:inline text-slate-300 dark:text-white/20">·</span>
-            <span>© 2026 Eximora. Two-way trade orchestration.</span>
+            <span>© 2026 Tiffora. Interstate trade orchestration.</span>
             <span className="hidden sm:inline text-slate-300 dark:text-white/20">·</span>
             <span>Asset-Light Trader</span>
           </div>
 
-          {/* Trade Corridors & Desk Centers */}
-          <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-mono text-[11px] tracking-wider uppercase">
+          {/* Interstate Trade Corridors & Desk Centers */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 text-slate-500 dark:text-slate-400 font-mono text-[11px] tracking-wider uppercase">
+            <span>Delhi NCR</span>
+            <span aria-hidden="true">·</span>
+            <span>Ludhiana</span>
+            <span aria-hidden="true">·</span>
+            <span>Ahmedabad</span>
+            <span aria-hidden="true">·</span>
             <span>Mumbai</span>
             <span aria-hidden="true">·</span>
-            <span>Dubai</span>
+            <span>Bengaluru</span>
             <span aria-hidden="true">·</span>
-            <span>Singapore</span>
-            <span aria-hidden="true">·</span>
-            <span>Rotterdam</span>
+            <span>Chennai</span>
           </div>
 
           {/* Direct Desk Actions */}
@@ -674,7 +716,7 @@ export default function App() {
         initialChapterIndex={videoChapterIndex}
       />
 
-      {/* Floating AI Trade Concierge: Exora */}
+      {/* Floating AI Trade Concierge: Tiffora AI */}
       <ExoraChatbot onOpenOrderModal={() => handleOpenOrderModal('export_agro')} />
 
       {/* Real-Time Floating Vendor Order Toast Notification */}

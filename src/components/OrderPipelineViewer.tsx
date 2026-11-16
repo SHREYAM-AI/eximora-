@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Wheat,
   Cpu,
@@ -15,19 +15,47 @@ import {
   Plane,
   Anchor,
   Box,
+  QrCode,
+  X,
 } from 'lucide-react';
 import { TradeOrder, OrderStage } from '../types/order';
+import { ShipmentQrCodeCard } from './ShipmentQrCodeCard';
 
 interface OrderPipelineViewerProps {
   orders: TradeOrder[];
   onOpenOrderModal: () => void;
   onAdvanceOrder: (orderId: string) => Promise<void>;
+  trackedOrderQuery?: string | null;
+  onClearTrackedQuery?: () => void;
 }
 
-export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }: OrderPipelineViewerProps) {
+export function OrderPipelineViewer({
+  orders,
+  onOpenOrderModal,
+  onAdvanceOrder,
+  trackedOrderQuery,
+  onClearTrackedQuery,
+}: OrderPipelineViewerProps) {
   const [selectedOrder, setSelectedOrder] = useState<TradeOrder | null>(orders[0] || null);
   const [advancingId, setAdvancingId] = useState<string | null>(null);
   const [filterCorridor, setFilterCorridor] = useState<'all' | 'export_agro' | 'import_electronics'>('all');
+
+  const normalizedTrackQuery = trackedOrderQuery?.trim().toLowerCase() || '';
+  const trackedMatchedOrder = normalizedTrackQuery
+    ? orders.find(
+        (o) =>
+          o.orderNumber.toLowerCase() === normalizedTrackQuery ||
+          o.id.toLowerCase() === normalizedTrackQuery ||
+          o.fulfillmentDoc?.trackingNumber?.toLowerCase() === normalizedTrackQuery
+      ) || null
+    : null;
+
+  useEffect(() => {
+    if (trackedMatchedOrder) {
+      setFilterCorridor('all');
+      setSelectedOrder(trackedMatchedOrder);
+    }
+  }, [trackedMatchedOrder?.id]);
 
   const filteredOrders = orders.filter((o) => {
     if (filterCorridor === 'all') return true;
@@ -85,7 +113,7 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
             Order with AI: From Query to Fulfillment
           </h2>
           <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl font-light">
-            Customers register trade queries directly with Exora AI. Our asset-light architecture immediately routes specifications into verified producer matching, quality certification, shipping, and delivery fulfillment.
+            Buyers and vendors register interstate trade queries directly with Tiffora AI. Our asset-light architecture immediately routes specifications into certified FPO/hub matching, FSSAI/BIS certification, E-Way road/rail dispatch, and delivery fulfillment.
           </p>
         </div>
 
@@ -111,11 +139,11 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
           </div>
           <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">AI Query Registration</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-            The client specifies commodity specs or requirements. AI parses trade terms, HSN codes, and regulatory compliance.
+            The client specifies commodity specs, origin state, and destination hub. AI parses trade terms, HSN codes, and IGST compliance.
           </p>
           <div className="mt-3 pt-2 border-t border-slate-200 dark:border-white/5 flex items-center gap-1.5 text-[11px] text-amber-800 dark:text-amber-200/90 font-mono">
             <FileText className="w-3 h-3 text-amber-600 dark:text-amber-300" />
-            <span>Trade Docket Generated</span>
+            <span>Interstate Docket Generated</span>
           </div>
         </div>
 
@@ -127,7 +155,7 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
           </div>
           <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">Source & Quality Certify</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-            Direct matching with verified Indian farmers or global electronics clusters. Rigorous third-party lab certification (APEDA/BIS).
+            Direct matching with certified state farmer FPOs or metro electronics hubs. Third-party lab and quality verification (FSSAI / AGMARK / BIS CRS).
           </p>
           <div className="mt-3 pt-2 border-t border-slate-200 dark:border-white/5 flex items-center gap-1.5 text-[11px] text-amber-800 dark:text-amber-200/90 font-mono">
             <ShieldCheck className="w-3 h-3 text-amber-600 dark:text-amber-300" />
@@ -139,11 +167,11 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
         <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 relative overflow-hidden shadow-xs">
           <div className="flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400 mb-2">
             <span className="text-amber-700 dark:text-amber-300 font-semibold uppercase">Step 03</span>
-            <span>Global Handover</span>
+            <span>Pan-India Handover</span>
           </div>
           <h3 className="text-sm font-serif font-semibold text-slate-900 dark:text-white">Fulfillment & Delivery</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-            Customs clearance, live container/AWB airway freight tracking, and final delivery sign-off at destination port/warehouse.
+            NIC E-Way Bill &amp; IGST verification, GPS express truck or CONCOR container rail tracking, and doorstep warehouse sign-off.
           </p>
           <div className="mt-3 pt-2 border-t border-slate-200 dark:border-white/5 flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-mono">
             <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
@@ -180,7 +208,7 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
                 }`}
               >
                 <Wheat className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                <span>Food Export</span>
+                <span>State Agro Dispatch</span>
               </button>
               <button
                 type="button"
@@ -192,7 +220,7 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
                 }`}
               >
                 <Cpu className="w-3 h-3 text-amber-600 dark:text-amber-300" />
-                <span>Electronics Import</span>
+                <span>Electronics Supply</span>
               </button>
             </div>
           </div>
@@ -201,6 +229,36 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
             {orders.length} Active Trade Orders Indexed
           </span>
         </div>
+
+        {/* Direct QR Tracking Link Status Banner */}
+        {trackedOrderQuery && (
+          <div
+            className={`mt-4 p-3 rounded-xl border flex flex-wrap items-center justify-between gap-2 text-xs font-mono ${
+              trackedMatchedOrder
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300'
+                : 'bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <QrCode className="w-4 h-4 shrink-0" />
+              <span>
+                {trackedMatchedOrder
+                  ? `QR Tracking Active: Showing live status for ${trackedMatchedOrder.orderNumber}`
+                  : `QR Tracking Reference "${trackedOrderQuery}" is not in active session memory`}
+              </span>
+            </div>
+            {onClearTrackedQuery && (
+              <button
+                type="button"
+                onClick={onClearTrackedQuery}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-[11px] cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+                <span>Dismiss</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Empty State or Master-Detail Split Grid */}
         {orders.length === 0 ? (
@@ -300,7 +358,7 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
                     </span>
                     <span className="text-slate-300 dark:text-white/20">·</span>
                     <span className="text-xs font-mono uppercase text-amber-700 dark:text-amber-300/90 font-medium">
-                      {activeOrder.corridor === 'export_agro' ? 'Food Export' : 'Electronics Import'}
+                      {activeOrder.corridor === 'export_agro' ? 'State Agro Dispatch' : 'Metro Tech Supply'}
                     </span>
                   </div>
                   <h3 className="text-base font-serif font-semibold text-slate-900 dark:text-white mt-0.5">
@@ -322,7 +380,7 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 shadow-xs">
-                  <span className="text-[10px] font-mono uppercase text-slate-500 block">Incoterm</span>
+                  <span className="text-[10px] font-mono uppercase text-slate-500 block">Trade Term</span>
                   <span className="text-amber-800 dark:text-amber-200 font-medium mt-0.5 block">
                     {activeOrder.incoterm}
                   </span>
@@ -340,6 +398,9 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
                   </span>
                 </div>
               </div>
+
+              {/* Unique Shipment QR Code Generator & Dispatch Pass */}
+              <ShipmentQrCodeCard order={activeOrder} />
 
               {/* AI Query Analysis Box */}
               <div className="p-4 rounded-xl bg-amber-500/[0.06] dark:bg-amber-400/[0.03] border border-amber-500/20 dark:border-amber-400/20 text-xs space-y-2">
@@ -399,15 +460,15 @@ export function OrderPipelineViewer({ orders, onOpenOrderModal, onAdvanceOrder }
               {activeOrder.fulfillmentDoc && (
                 <div className="p-3.5 rounded-xl bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono shadow-xs">
                   <div>
-                    <span className="text-[10px] uppercase text-slate-500 block">Freight Manifest / AWB</span>
+                    <span className="text-[10px] uppercase text-slate-500 block">E-Way Bill / LR Docket</span>
                     <span className="text-amber-800 dark:text-amber-200 font-bold">{activeOrder.fulfillmentDoc.trackingNumber}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase text-slate-500 block">Carrier / Vessel</span>
+                    <span className="text-[10px] uppercase text-slate-500 block">Truck / Rail Carrier</span>
                     <span className="text-slate-700 dark:text-slate-300">{activeOrder.fulfillmentDoc.vesselOrFlight}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase text-slate-500 block">Inspection Certificate</span>
+                    <span className="text-[10px] uppercase text-slate-500 block">Quality Pass ID</span>
                     <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{activeOrder.fulfillmentDoc.inspectionPassId}</span>
                   </div>
                 </div>

@@ -20,7 +20,7 @@ export function ThemeToggle({ className = '', showLabel = false }: ThemeTogglePr
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
     try {
-      localStorage.setItem('eximora_theme', nextTheme);
+      localStorage.setItem('tiffora_theme', nextTheme);
       if (nextTheme === 'dark') {
         document.documentElement.classList.add('dark');
       } else {
